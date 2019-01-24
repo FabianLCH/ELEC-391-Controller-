@@ -62,8 +62,10 @@ char _c51_external_startup (void)
 	#endif
 	
 	P0MDOUT |= 0x10; // Enable UART0 TX as push-pull output
-	XBR0     = 0x01; // Enable UART0 on P0.4(TX) and P0.5(RX)                     
-	XBR1     = 0X00;
+	XBR0     = 0x01; // Enable UART0 on P0.4(TX) and P0.5(RX)  
+	            
+	XBR1     = 0X01; //Enable PCA I/O and route CEX0 only (check reference manual page 120)
+	
 	XBR2     = 0x40; // Enable crossbar and weak pull-ups
 
 	// Configure Uart 0
@@ -80,7 +82,7 @@ char _c51_external_startup (void)
   	
 	return 0;
 }
-/*
+
 // Uses Timer3 to delay <us> micro-seconds. 
 void Timer3us(unsigned char us)
 {
@@ -108,20 +110,53 @@ void waitms (unsigned int ms)
 	for(j=0; j<ms; j++)
 		for (k=0; k<4; k++) Timer3us(250);
 }
-*/
+
 void ConfigPCA0()
 {
-	//Load the PCA0CP high byte with an initial value of 0
-	PCA0CPH0 = 0b_0000_0000;
+	SFRPAGE = 0x00; 
+
+	PCA0POL = 0b_0000_0000; //Set the output polarity for all channels to default (no inversion)
+	PCA0MD = 0b_0000_0000; //Set PCA mode to operate even in idle mode with SYSCLK/4
+	PCA0PWM = 0b_0000_0000;	//Enable 8-bit PWM with no overflow flag set and no interrupts enabled
 	
-	//Configure PCA0 to function in 8-bit PWM mode
-	PCA0CPM0 = 0b_0100_0010;
+	PCA0CLR = 0b_0000_0000; //Disable comparator clear for all modules
 	
-	//Enable 8-bit PWM with no flag set and no interrupts enabled
-	PCA0PWM0 = 0b_0000_0000;
+	PCA0CENT = 0b_0000_0000; //Set all modules to edge aligned mode
+	PCA0CN0 = 0b_0100_0000; //Start the PCA counter/timer running (CR bit)	
 	
-	//Set the output polarity for all channels to default (no inversion)
-	PCA0POL = 0b_0000_0000;
+	//CHANNEL 0 CONFIGURATION
+	PCA0CPM0 = 0b_0100_0010;//Configure PCA0 to function in 8-bit PWM mode
+	PCA0CPH0 = 0b_1000_0000; //Load the PCA0CP0 high byte with an initial value of 0
+	
+	
 }
 
-void main (void) {}
+void main (void) 
+{
+	unsigned char pinSelected = 1<<4;
+	
+	printf("\x1b[2J"); // Clear screen using ANSI escape sequence.
+	
+	printf ("PCA0 in 8-bit PWM mode test program\n"
+	        "File: %s\n"
+	        "Compiled: %s, %s\n\n",
+	        __FILE__, __DATE__, __TIME__);
+	            	
+	SFRPAGE = 0x20;
+	
+	P1MDOUT &= pinSelected; //Set the pin output mode to push-pull	
+	P1SKIP |= ~pinSelected; //Skip all P1.x pins except for P1.4
+	
+	SFRPAGE = 0x00;
+		
+	ConfigPCA0();
+	
+	printf("PCA configuration done.");
+	
+	
+	while(1)
+	{
+		
+	}
+	
+}

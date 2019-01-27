@@ -119,6 +119,34 @@ void waitms (unsigned int ms)
 		for (k=0; k<4; k++) Timer3us(250);
 }
 
+#define VDD 3.293 // The measured value of VDD in volts
+void InitADC (void)
+{
+	SFRPAGE = 0x00;
+	ADC0CN1 = 0b_10_000_000; //14-bit,  Right justified no shifting applied, perform and Accumulate 1 conversion.
+	ADC0CF0 = 0b_11111_0_00; // SYSCLK/32
+	ADC0CF1 = 0b_0_0_011110; // Same as default for now
+	ADC0CN0 = 0b_0_0_0_0_0_00_0; // Same as default for now
+	ADC0CF2 = 0b_0_01_11111 ; // GND pin, Vref=VDD
+	ADC0CN2 = 0b_0_000_0000;  // Same as default for now. ADC0 conversion initiated on write of 1 to ADBUSY.
+	ADEN=1; // Enable ADC
+}
+
+unsigned int ADC_at_Pin(unsigned char pin)
+{
+	ADC0MX = pin;   // Select input from pin
+	ADBUSY=1;       // Dummy conversion first to select new pin
+	while (ADBUSY); // Wait for dummy conversion to finish
+	ADBUSY = 1;     // Convert voltage at the pin
+	while (ADBUSY); // Wait for conversion to complete
+	return (ADC0);
+}
+
+float Volts_at_Pin(unsigned char pin)
+{
+	 return ((ADC_at_Pin(pin)*VDD)/16383.0);
+}
+
 void ConfigPCA0()
 {
 	SFRPAGE = 0x00; //Navigate to SFR page for register write
@@ -219,7 +247,7 @@ void main (void)
 {
 	//unsigned char pinSelected = 1 << 4;
 	//unsigned char all_one = 255;
-
+	float voltages[3];
 	
 	printf("\x1b[2J"); // Clear screen using ANSI escape sequence.
 	
@@ -228,26 +256,33 @@ void main (void)
 	        "Compiled: %s, %s\n\n",
 	        __FILE__, __DATE__, __TIME__);
 	
-	P0SKIP |= 0b_1100_1111; //PLACE THIS BEFORE THE SFRPAGE (when SFRPAGE is 0x00)
 	
-	P1SKIP |= 0b_0111_1111;
+	P0SKIP |= 0b_1100_1111; //Skip all P0 bits except bits 4 and 5 (UART0)
 	
-	P2MDOUT |= 0b_0001_1111;
-	P1MDOUT |= 0b_1000_0000;
+	SFRPAGE = 0x20;
+	P1MDIN &= 0b_1000_1111; //Set P1 bits 4,5,6 to analog input for ADC
+	SFRPAGE = 0x00;
 	
-	//P1MDOUT |= pinSelected; //Set the pin output mode to push-pull (USE |= instead of &= FOR BETTER WAVE)
-	//P1SKIP |= ~pinSelected; //Skip all P1.x pins except for P1.4
-		
+	P1SKIP |= 0b_0111_1111; //Skip all P1 bits except bit 7
+	
+	P2MDOUT |= 0b_0001_1111; //Set P2 bits 5,6,7 to push-pull output mode
+	P1MDOUT |= 0b_1000_0000; //Set P1 bit 7 to push-pull output mode
+	
 	ConfigPCA0();
-	
 	printf("PCA configuration done.");
-	
+
+	InitADC();
+	printf("ADC configuration done.\n");
 	
 	while(1)
 	{
-		//takeStep('F');
+		takeStep('F');
+		voltages[0] = Volts_at_Pin(QFP32_MUX_P1_4);
+		voltages[1] = Volts_at_Pin(QFP32_MUX_P1_5);
+		voltages[2] = Volts_at_Pin(QFP32_MUX_P1_6);
+		printf("V@P1.4=%7.5fV, V@P1.5=%7.5fV, V@P1.6=%7.5fV\r", voltages[0], voltages[1], voltages[2]);
 		waitms(2);	
-		printf("Fam");
+	
 	}
 	
 }

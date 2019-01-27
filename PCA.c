@@ -70,8 +70,9 @@ char _c51_external_startup (void)
 	
 	P0MDOUT |= 0x10; // Enable UART0 TX as push-pull output
 	XBR0     = 0x01; // Enable UART0 on P0.4(TX) and P0.5(RX)  
-	            
-	XBR1     = 0X01; //Enable PCA I/O and route CEX0 only (check reference manual page 120)
+	
+	//PCA MODULES ARE ROUTED IN ORDER!
+	XBR1     = 0X02; //Enable PCA I/O and route CEX0 and CEX1 only (check reference manual page 120)
 	
 	XBR2     = 0x40; // Enable crossbar and weak pull-ups
 
@@ -120,21 +121,24 @@ void waitms (unsigned int ms)
 
 void ConfigPCA0()
 {
-	SFRPAGE = 0x00; 
+	SFRPAGE = 0x00; //Navigate to SFR page for register write
 	
-	PCA0POL = 0b_0000_0000; //Set the output polarity for all channels to default (no inversion)
+	PCA0POL = 0b_0000_0010; //Set the output polarity for all channels to default (no inversion)
+	
 	PCA0MD = 0b_0000_0000; //Set PCA mode to operate even in idle mode with SYSCLK/12
 	PCA0PWM = 0b_0000_0000;	//Enable 8-bit PWM with no overflow flag set and no interrupts enabled
-	
 	PCA0CLR = 0b_0000_0000; //Disable comparator clear for all modules
-	//Module 0 will be set to center-aligned for testing purposes
-	PCA0CENT = 0b_0000_0001; //Set all modules to edge aligned mode
-	PCA0CN0 = 0b_0100_0000; //Start the PCA counter/timer running (CR bit)	
+	PCA0CENT = 0b_0000_0000; //Set all modules to edge aligned mode
+	
+	PCA0CN0 = 0b_0100_0000; //Start the PCA counter/timer (CR bit)	
 	
 	//CHANNEL 0 CONFIGURATION
-	PCA0CPM0 = 0b_0100_0010;//Configure PCA0 to function in 8-bit PWM mode
+	PCA0CPM0 = 0b_0100_0010;//Configure Channel 0 to function in 8-bit PWM mode
 	PCA0CPH0 = 0b_0100_0000; //Load the PCA0CP0 high byte with an initial value of 128(binary 1000_0000)
 	
+	//CHANNEL 1 CONFIGURATION
+	PCA0CPM1 = 0b_0100_0010; //Configure Channel 1 to function in 8-bit PWM mode
+	PCA0CPH1 = 0b_0100_0000; //Load the PCA0CP1 high byte
 	
 }
 
@@ -214,7 +218,7 @@ void takeStep(char instr)
 void main (void) 
 {
 	//unsigned char pinSelected = 1 << 4;
-	unsigned char all_one = 255;
+	//unsigned char all_one = 255;
 
 	
 	printf("\x1b[2J"); // Clear screen using ANSI escape sequence.
@@ -223,16 +227,16 @@ void main (void)
 	        "File: %s\n"
 	        "Compiled: %s, %s\n\n",
 	        __FILE__, __DATE__, __TIME__);
-	            	
-	SFRPAGE = 0x20;
+	
+	P0SKIP |= 0b_1100_1111; //PLACE THIS BEFORE THE SFRPAGE (when SFRPAGE is 0x00)
+	
+	P1SKIP |= 0b_0111_1111;
 	
 	P2MDOUT |= 0b_0001_1111;
-	P1SKIP |= all_one;
+	P1MDOUT |= 0b_1000_0000;
+	
 	//P1MDOUT |= pinSelected; //Set the pin output mode to push-pull (USE |= instead of &= FOR BETTER WAVE)
 	//P1SKIP |= ~pinSelected; //Skip all P1.x pins except for P1.4
-	P0SKIP |= all_one;
-	
-	SFRPAGE = 0x00;
 		
 	ConfigPCA0();
 	
@@ -241,8 +245,9 @@ void main (void)
 	
 	while(1)
 	{
-		takeStep('F');
-		waitms(3);	
+		//takeStep('F');
+		waitms(2);	
+		printf("Fam");
 	}
 	
 }

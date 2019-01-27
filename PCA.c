@@ -13,6 +13,13 @@ outputs a PWM signal through two of the available channels
 #define SYSCLK 72000000L
 #define BAUDRATE 115200L
 
+#define PORT1 P2_1
+#define PORT2 P2_2
+#define PORT3 P2_3
+#define PORT4 P2_4
+
+int stepCount = 0;
+
 char _c51_external_startup (void)
 {
 	// Disable Watchdog with key sequence
@@ -126,15 +133,89 @@ void ConfigPCA0()
 	
 	//CHANNEL 0 CONFIGURATION
 	PCA0CPM0 = 0b_0100_0010;//Configure PCA0 to function in 8-bit PWM mode
-	PCA0CPH0 = 0b_1000_0000; //Load the PCA0CP0 high byte with an initial value of 0
+	PCA0CPH0 = 0b_0100_0000; //Load the PCA0CP0 high byte with an initial value of 128(binary 1000_0000)
 	
 	
 }
 
+void takeStep(char instr)
+{
+	if(instr == 'F') //If the instruction is to move forward...
+	{
+		switch(stepCount)
+		{
+			case 0: //Step 0
+				PORT1 = 1;
+				PORT2 = 0;
+				PORT3 = 0;
+				PORT4 = 0;
+				break;
+			
+			case 1: //Step 1
+				PORT1 = 0;
+				PORT2 = 1;
+				PORT3 = 0;
+				PORT4 = 0;
+				break;
+				
+			case 2: //Step 2
+				PORT1 = 0;
+				PORT2 = 0;
+				PORT3 = 1;
+				PORT4 = 0;
+				break;
+			
+			case 3: //Step 3
+				PORT1 = 0;
+				PORT2 = 0;
+				PORT3 = 0;
+				PORT4 = 1;
+				break;
+		}
+	}
+	else //Go in reverse
+	{
+		switch(stepCount)
+		{
+			case 0: //Step 0
+				PORT1 = 0;
+				PORT2 = 0;
+				PORT3 = 0;
+				PORT4 = 1;
+				break;
+			
+			case 1: //Step 1
+				PORT1 = 0;
+				PORT2 = 0;
+				PORT3 = 1;
+				PORT4 = 0;
+				break;
+				
+			case 2: //Step 2
+				PORT1 = 0;
+				PORT2 = 1;
+				PORT3 = 0;
+				PORT4 = 0;
+				break;
+			
+			case 3: //Step 3
+				PORT1 = 1;
+				PORT2 = 0;
+				PORT3 = 0;
+				PORT4 = 0;
+				break;
+		}
+	}
+	stepCount++;
+	if(stepCount > 3)
+		stepCount = 0;
+}
+
 void main (void) 
 {
-	unsigned char pinSelected = 1 << 4;
+	//unsigned char pinSelected = 1 << 4;
 	unsigned char all_one = 255;
+
 	
 	printf("\x1b[2J"); // Clear screen using ANSI escape sequence.
 	
@@ -145,8 +226,10 @@ void main (void)
 	            	
 	SFRPAGE = 0x20;
 	
-	P1MDOUT &= pinSelected; //Set the pin output mode to push-pull	
-	P1SKIP |= ~pinSelected; //Skip all P1.x pins except for P1.4
+	P2MDOUT |= 0b_0001_1111;
+	P1SKIP |= all_one;
+	//P1MDOUT |= pinSelected; //Set the pin output mode to push-pull (USE |= instead of &= FOR BETTER WAVE)
+	//P1SKIP |= ~pinSelected; //Skip all P1.x pins except for P1.4
 	P0SKIP |= all_one;
 	
 	SFRPAGE = 0x00;
@@ -158,7 +241,8 @@ void main (void)
 	
 	while(1)
 	{
-		P0_0 = 1;	
+		takeStep('F');
+		waitms(3);	
 	}
 	
 }

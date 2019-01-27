@@ -114,14 +114,14 @@ void waitms (unsigned int ms)
 void ConfigPCA0()
 {
 	SFRPAGE = 0x00; 
-
+	
 	PCA0POL = 0b_0000_0000; //Set the output polarity for all channels to default (no inversion)
-	PCA0MD = 0b_0000_0000; //Set PCA mode to operate even in idle mode with SYSCLK/4
+	PCA0MD = 0b_0000_0000; //Set PCA mode to operate even in idle mode with SYSCLK/12
 	PCA0PWM = 0b_0000_0000;	//Enable 8-bit PWM with no overflow flag set and no interrupts enabled
 	
 	PCA0CLR = 0b_0000_0000; //Disable comparator clear for all modules
-	
-	PCA0CENT = 0b_0000_0000; //Set all modules to edge aligned mode
+	//Module 0 will be set to center-aligned for testing purposes
+	PCA0CENT = 0b_0000_0001; //Set all modules to edge aligned mode
 	PCA0CN0 = 0b_0100_0000; //Start the PCA counter/timer running (CR bit)	
 	
 	//CHANNEL 0 CONFIGURATION
@@ -133,7 +133,8 @@ void ConfigPCA0()
 
 void main (void) 
 {
-	unsigned char pinSelected = 1<<4;
+	unsigned char pinSelected = 1 << 4;
+	unsigned char all_one = 255;
 	
 	printf("\x1b[2J"); // Clear screen using ANSI escape sequence.
 	
@@ -146,6 +147,7 @@ void main (void)
 	
 	P1MDOUT &= pinSelected; //Set the pin output mode to push-pull	
 	P1SKIP |= ~pinSelected; //Skip all P1.x pins except for P1.4
+	P0SKIP |= all_one;
 	
 	SFRPAGE = 0x00;
 		
@@ -156,7 +158,7 @@ void main (void)
 	
 	while(1)
 	{
-		
+		P0_0 = 1;	
 	}
 	
 }

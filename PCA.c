@@ -18,6 +18,8 @@ outputs a PWM signal through two of the available channels
 #define PORT3 P2_3
 #define PORT4 P2_4
 
+#define VDD 3.291 // The measured value of VDD in volts
+
 int stepCount = 0;
 
 char _c51_external_startup (void)
@@ -119,7 +121,6 @@ void waitms (unsigned int ms)
 		for (k=0; k<4; k++) Timer3us(250);
 }
 
-#define VDD 3.293 // The measured value of VDD in volts
 void InitADC (void)
 {
 	SFRPAGE = 0x00;
@@ -243,11 +244,28 @@ void takeStep(char instr)
 		stepCount = 0;
 }
 
+void ConfigurePins()
+{
+	P0SKIP |= 0b_1100_1111; //Skip all P0 bits except bits 4 and 5 (UART0)
+	
+	SFRPAGE = 0x20;
+	
+	P1MDIN &= 0b_1000_1111; //Set P1 bits 4,5,6 to analog input for ADC
+	
+	SFRPAGE = 0x00;
+	
+	P1SKIP |= 0b_0111_1111; //Skip all P1 bits except bit 7
+	
+	P2MDOUT |= 0b_0001_1111; //Set P2 bits 5,6,7 to push-pull output mode
+	P1MDOUT |= 0b_1000_0000; //Set P1 bit 7 to push-pull output mode	
+}
+
 void main (void) 
 {
 	//unsigned char pinSelected = 1 << 4;
 	//unsigned char all_one = 255;
 	float voltages[3];
+	int measureCount;
 	
 	printf("\x1b[2J"); // Clear screen using ANSI escape sequence.
 	
@@ -257,30 +275,33 @@ void main (void)
 	        __FILE__, __DATE__, __TIME__);
 	
 	
-	P0SKIP |= 0b_1100_1111; //Skip all P0 bits except bits 4 and 5 (UART0)
-	
-	SFRPAGE = 0x20;
-	P1MDIN &= 0b_1000_1111; //Set P1 bits 4,5,6 to analog input for ADC
-	SFRPAGE = 0x00;
-	
-	P1SKIP |= 0b_0111_1111; //Skip all P1 bits except bit 7
-	
-	P2MDOUT |= 0b_0001_1111; //Set P2 bits 5,6,7 to push-pull output mode
-	P1MDOUT |= 0b_1000_0000; //Set P1 bit 7 to push-pull output mode
+	ConfigurePins();
+	printf("Pin configuration done.\n");
 	
 	ConfigPCA0();
-	printf("PCA configuration done.");
+	printf("PCA configuration done.\n");
 
 	InitADC();
 	printf("ADC configuration done.\n");
 	
 	while(1)
 	{
-		takeStep('F');
-		voltages[0] = Volts_at_Pin(QFP32_MUX_P1_4);
-		voltages[1] = Volts_at_Pin(QFP32_MUX_P1_5);
-		voltages[2] = Volts_at_Pin(QFP32_MUX_P1_6);
-		printf("V@P1.4=%7.5fV, V@P1.5=%7.5fV, V@P1.6=%7.5fV\r", voltages[0], voltages[1], voltages[2]);
+		takeStep('F'); 
+		
+		voltages[0] = 0;
+		voltages[1] = 0;
+		voltages[2] = 0;
+		
+		//Take the average of 10 measurements and print it out
+		for(measureCount = 0; measureCount < 10; measureCount++)
+		{
+			voltages[0] += Volts_at_Pin(QFP32_MUX_P1_4);
+			voltages[1] += Volts_at_Pin(QFP32_MUX_P1_5);
+			voltages[2] += Volts_at_Pin(QFP32_MUX_P1_6);
+		}
+		
+		printf("V@P1.4=%7.3fV, V@P1.5=%7.3fV, V@P1.6=%7.3fV\r", voltages[0]/10, voltages[1]/10, voltages[2]/10);
+		
 		waitms(2);	
 	
 	}

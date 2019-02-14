@@ -21,6 +21,7 @@ outputs a PWM signal through two of the available channels
 #define VDD 3.291 // The measured value of VDD in volts
 
 int stepCount = 0;
+int totalSteps = 0;
 
 char _c51_external_startup (void)
 {
@@ -121,6 +122,28 @@ void waitms (unsigned int ms)
 		for (k=0; k<4; k++) Timer3us(250);
 }
 
+int getsn (char * buff, int len)
+{
+	int j;
+	char c;
+	
+	for(j=0; j<(len-1); j++)
+	{
+		c=getchar();
+		if ( (c=='\n') || (c=='\r') )
+		{
+			buff[j]=0;
+			return j;
+		}
+		else
+		{
+			buff[j]=c;
+		}
+	}
+	buff[j]=0;
+	return len;
+}
+
 void InitADC (void)
 {
 	SFRPAGE = 0x00;
@@ -152,7 +175,7 @@ void ConfigPCA0()
 {
 	SFRPAGE = 0x00; //Navigate to SFR page for register write
 	
-	PCA0POL = 0b_0000_0010; //Set the output polarity for all channels to default (no inversion)
+	PCA0POL = 0b_0000_0000; //Set the output polarity for all channels to default (no inversion)
 	
 	PCA0MD = 0b_0000_0000; //Set PCA mode to operate even in idle mode with SYSCLK/12
 	PCA0PWM = 0b_0000_0000;	//Enable 8-bit PWM with no overflow flag set and no interrupts enabled
@@ -167,7 +190,7 @@ void ConfigPCA0()
 	
 	//CHANNEL 1 CONFIGURATION
 	PCA0CPM1 = 0b_0100_0010; //Configure Channel 1 to function in 8-bit PWM mode
-	PCA0CPH1 = 0b_0100_0000; //Load the PCA0CP1 high byte
+	PCA0CPH1 = 0b_1000_0000; //Load the PCA0CP1 high byte
 	
 }
 
@@ -179,7 +202,7 @@ void takeStep(char instr)
 		{
 			case 0: //Step 0
 				PORT1 = 1;
-				PORT2 = 0;
+				PORT2 = 1;
 				PORT3 = 0;
 				PORT4 = 0;
 				break;
@@ -187,7 +210,7 @@ void takeStep(char instr)
 			case 1: //Step 1
 				PORT1 = 0;
 				PORT2 = 1;
-				PORT3 = 0;
+				PORT3 = 1;
 				PORT4 = 0;
 				break;
 				
@@ -195,11 +218,11 @@ void takeStep(char instr)
 				PORT1 = 0;
 				PORT2 = 0;
 				PORT3 = 1;
-				PORT4 = 0;
+				PORT4 = 1;
 				break;
 			
 			case 3: //Step 3
-				PORT1 = 0;
+				PORT1 = 1;
 				PORT2 = 0;
 				PORT3 = 0;
 				PORT4 = 1;
@@ -211,7 +234,7 @@ void takeStep(char instr)
 		switch(stepCount)
 		{
 			case 0: //Step 0
-				PORT1 = 0;
+				PORT1 = 1;
 				PORT2 = 0;
 				PORT3 = 0;
 				PORT4 = 1;
@@ -221,25 +244,26 @@ void takeStep(char instr)
 				PORT1 = 0;
 				PORT2 = 0;
 				PORT3 = 1;
-				PORT4 = 0;
+				PORT4 = 1;
 				break;
 				
 			case 2: //Step 2
 				PORT1 = 0;
 				PORT2 = 1;
-				PORT3 = 0;
+				PORT3 = 1;
 				PORT4 = 0;
 				break;
 			
 			case 3: //Step 3
 				PORT1 = 1;
-				PORT2 = 0;
+				PORT2 = 1;
 				PORT3 = 0;
 				PORT4 = 0;
 				break;
 		}
 	}
 	stepCount++;
+	totalSteps++;
 	if(stepCount > 3)
 		stepCount = 0;
 }
@@ -262,10 +286,18 @@ void ConfigurePins()
 
 void main (void) 
 {
-	//unsigned char pinSelected = 1 << 4;
-	//unsigned char all_one = 255;
+
+	//Float arrays used to store the measurements of the ADC pins
+	float vReadings[3];
 	float voltages[3];
-	int measureCount;
+	
+	//Character variables and arrays to read user input (direction) for testing
+	char dir[4];
+	char direction;
+	
+	//Variables used to control the amount of measurements of the ADC to take before writing a voltage reading
+	int measureCount = 0;
+	int totalMeasurements = 500;
 	
 	printf("\x1b[2J"); // Clear screen using ANSI escape sequence.
 	
@@ -284,26 +316,51 @@ void main (void)
 	InitADC();
 	printf("ADC configuration done.\n");
 	
+	printf("\n");
+	
+	printf("Enter direction of rotation:\n");
+	getsn(dir,sizeof(dir));
+	
+	sscanf(dir,"%c",&direction);
+	
+	if(direction == 'F')
+		printf("Moving forward.\n");
+	else
+		printf("Moving backwards.\n");
+	
 	while(1)
-	{
-		takeStep('F'); 
-		
-		voltages[0] = 0;
-		voltages[1] = 0;
-		voltages[2] = 0;
+	{	
+	
+		takeStep(direction);
 		
 		//Take the average of 10 measurements and print it out
-		for(measureCount = 0; measureCount < 10; measureCount++)
+		if(measureCount < totalMeasurements)
 		{
+			//Add the current reading to the corresponding array position
 			voltages[0] += Volts_at_Pin(QFP32_MUX_P1_4);
 			voltages[1] += Volts_at_Pin(QFP32_MUX_P1_5);
 			voltages[2] += Volts_at_Pin(QFP32_MUX_P1_6);
+			
+			//Increase measureCount variable
+			measureCount++;
+		}
+		else
+		{
+			//Store the readings in separate variables that are only updated every 10 readings
+			vReadings[0] = voltages[0]/totalMeasurements;
+			vReadings[1] = voltages[1]/totalMeasurements;
+			vReadings[2] = voltages[2]/totalMeasurements;
+			
+			//Print the results to the terminal
+			printf("V@P1.4=%7.2fV, V@P1.5=%7.2fV, V@P1.6=%7.2fV\r", vReadings[0], vReadings[1], vReadings[2]);
+		
+			//Reset the voltages reading variables 
+			measureCount = 0;
+			voltages[0] = 0;
+			voltages[1] = 0;
+			voltages[2] = 0;
 		}
 		
-		printf("V@P1.4=%7.3fV, V@P1.5=%7.3fV, V@P1.6=%7.3fV\r", voltages[0]/10, voltages[1]/10, voltages[2]/10);
-		
-		waitms(2);	
-	
 	}
 	
 }

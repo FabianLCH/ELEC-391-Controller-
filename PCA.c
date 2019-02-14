@@ -2,7 +2,10 @@
 Author: Fabian Lozano
 
 PCA.c: Configures the PCA for operation in PWM mode and 
-outputs a PWM signal through two of the available channels
+outputs a PWM signal through one of the available modules
+
+EFM8LB1 configuration code, ADC setup code and timer setup code provided by
+Professor Jesus Calviño-Fraga from the University of British Columbia.
 
 */
 
@@ -13,12 +16,20 @@ outputs a PWM signal through two of the available channels
 #define SYSCLK 72000000L
 #define BAUDRATE 115200L
 
+//Ports used to drive the stepper motor
 #define PORT1 P2_1
 #define PORT2 P2_2
 #define PORT3 P2_3
 #define PORT4 P2_4
 
-#define VDD 3.291 // The measured value of VDD in volts
+// The measured value of VDD in volts for ADC
+#define VDD 3.291 
+
+//Timer 2 default frequency (used to control time between steps)
+#define TIMER_2_FREQ 500L
+#define TIMER_OUT_2 P2_5 //Timer 2 output pin (FOR TESTING ONLY, WILL BE REMOVED LATER)
+
+volatile unsigned char stepFlag = 1;
 
 int stepCount = 0;
 int totalSteps = 0;
@@ -91,6 +102,16 @@ char _c51_external_startup (void)
 	TR1 = 1; // START Timer1
 	TI = 1;  // Indicate TX0 ready
   	
+  	// Initialize timer 2 for periodic interrupts 
+	TMR2CN0=0x00;   // Stop Timer2; Clear TF2;
+	CKCON0|=0b_0001_0000; // Timer 2 uses the system clock
+	TMR2RL=(0x10000L-(SYSCLK/(2*TIMER_2_FREQ))); // Initialize reload value
+	TMR2=0xffff;   // Set to reload immediately
+	ET2=1;         // Enable Timer2 interrupts
+	TR2=1;         // Start Timer2 (TMR2CN is bit addressable)
+	
+	EA=1; // Enable interrupts
+
 	return 0;
 }
 
@@ -112,6 +133,16 @@ void Timer3us(unsigned char us)
 		TMR3CN0 &= ~(0x80);         // Clear overflow indicator
 	}
 	TMR3CN0 = 0 ;                   // Stop Timer3 and clear overflow flag
+}
+
+//Timer 2 will control the time between steps for the stepper motor
+void Timer2_ISR (void) interrupt INTERRUPT_TIMER2
+{
+	SFRPAGE=0x0;
+	TF2H = 0; // Clear Timer2 interrupt flag
+	
+	//Do useful stuff below this point
+	stepFlag = 1;
 }
 
 void waitms (unsigned int ms)
@@ -280,7 +311,7 @@ void ConfigurePins()
 	
 	P1SKIP |= 0b_0111_1111; //Skip all P1 bits except bit 7
 	
-	P2MDOUT |= 0b_0001_1111; //Set P2 bits 5,6,7 to push-pull output mode
+	P2MDOUT |= 0b_0111_1111; //Set P2 bits 0, 1, 2, 3, 4, 5 to push-pull output mode
 	P1MDOUT |= 0b_1000_0000; //Set P1 bit 7 to push-pull output mode	
 }
 
@@ -330,8 +361,13 @@ void main (void)
 	
 	while(1)
 	{	
-	
+		if(stepFlag == 1)
+		{
 		takeStep(direction);
+		stepFlag = 0;
+		}
+		
+		TIMER_OUT_2 = stepFlag;
 		
 		//Take the average of 10 measurements and print it out
 		if(measureCount < totalMeasurements)
@@ -352,7 +388,7 @@ void main (void)
 			vReadings[2] = voltages[2]/totalMeasurements;
 			
 			//Print the results to the terminal
-			printf("V@P1.4=%7.2fV, V@P1.5=%7.2fV, V@P1.6=%7.2fV\r", vReadings[0], vReadings[1], vReadings[2]);
+			printf("V(P1.4)=%4.2fV, V(P1.5)=%4.2fV, V(P1.6)=%4.2fV\r", vReadings[0], vReadings[1], vReadings[2]);
 		
 			//Reset the voltages reading variables 
 			measureCount = 0;
@@ -360,6 +396,7 @@ void main (void)
 			voltages[1] = 0;
 			voltages[2] = 0;
 		}
+		
 		
 	}
 	

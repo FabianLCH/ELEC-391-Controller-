@@ -143,6 +143,8 @@ void Timer2_ISR (void) interrupt INTERRUPT_TIMER2
 	
 	//Do useful stuff below this point
 	stepFlag = 1;
+	
+	
 }
 
 void waitms (unsigned int ms)
@@ -297,6 +299,7 @@ void takeStep(char instr)
 	totalSteps++;
 	if(stepCount > 3)
 		stepCount = 0;
+	
 }
 
 void ConfigurePins()
@@ -330,14 +333,12 @@ void main (void)
 	int measureCount = 0;
 	int totalMeasurements = 500;
 	
+	//Variables used to control the time between steps
+	int stepsInterruptCounter = 0;
+	int stepsTotalInterrupts = 15;
+	
 	printf("\x1b[2J"); // Clear screen using ANSI escape sequence.
-	
-	printf ("PCA0 in 8-bit PWM mode test program\n"
-	        "File: %s\n"
-	        "Compiled: %s, %s\n\n",
-	        __FILE__, __DATE__, __TIME__);
-	
-	
+		
 	ConfigurePins();
 	printf("Pin configuration done.\n");
 	
@@ -359,17 +360,33 @@ void main (void)
 	else
 		printf("Moving backwards.\n");
 	
-	while(1)
+	
+	while(1) //Main loop of the program begins here
 	{	
+	
+		
+		//Using timer 2, control how often steps and adc measurements are taken
 		if(stepFlag == 1)
-		{
-		takeStep(direction);
-		stepFlag = 0;
+		{	
+		
+			//Check if the number of interrupts equals our desired number and take a step if so  
+			if(stepsInterruptCounter < stepsTotalInterrupts)
+				stepsInterruptCounter++;
+			else 
+			{
+				takeStep(direction);
+				
+				TIMER_OUT_2 = !TIMER_OUT_2; //For testing purposes
+				
+				//Reset the stepsInterruptCounter variable for next step
+				stepsInterruptCounter = 0;
+			}
+			
+			//Reset the stepFlag set during the ISR
+			stepFlag = 0;
 		}
 		
-		TIMER_OUT_2 = stepFlag;
-		
-		//Take the average of 10 measurements and print it out
+		//Take the average of a given number of total measurements and print it out
 		if(measureCount < totalMeasurements)
 		{
 			//Add the current reading to the corresponding array position
@@ -388,14 +405,14 @@ void main (void)
 			vReadings[2] = voltages[2]/totalMeasurements;
 			
 			//Print the results to the terminal
-			printf("V(P1.4)=%4.2fV, V(P1.5)=%4.2fV, V(P1.6)=%4.2fV\r", vReadings[0], vReadings[1], vReadings[2]);
+			printf("V(P1.4)=%4.2fV, V(P1.5)=%4.2fV, V(P1.6)=%5.2fV\r", vReadings[0], vReadings[1], vReadings[2]);
 		
 			//Reset the voltages reading variables 
 			measureCount = 0;
 			voltages[0] = 0;
 			voltages[1] = 0;
 			voltages[2] = 0;
-		}
+		}		
 		
 		
 	}

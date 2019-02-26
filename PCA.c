@@ -318,6 +318,40 @@ void ConfigurePins()
 	P1MDOUT |= 0b_1000_0000; //Set P1 bit 7 to push-pull output mode	
 }
 
+void readADC(int *mCount, float *voltageMeasurements, float *voltageReadings)
+{
+	int totalMeasurements = 500;
+	
+		//Take the average of a given number of total measurements and print it out
+		if((*mCount) < totalMeasurements)
+		{
+			//Add the current reading to the corresponding array position
+			voltageMeasurements[0] += Volts_at_Pin(QFP32_MUX_P1_4);
+			voltageMeasurements[1] += Volts_at_Pin(QFP32_MUX_P1_5);
+			voltageMeasurements[2] += Volts_at_Pin(QFP32_MUX_P1_6);
+			
+			//Increase measureCount variable
+			(*mCount)++;
+		}
+		else
+		{
+			//Store the readings in separate variables that are only updated every 10 readings
+			voltageReadings[0] = voltageMeasurements[0]/totalMeasurements;
+			voltageReadings[1] = voltageMeasurements[1]/totalMeasurements;
+			voltageReadings[2] = voltageMeasurements[2]/totalMeasurements;
+			
+			//Print the results to the terminal
+			printf("V(P1.4)=%4.2fV, V(P1.5)=%4.2fV, V(P1.6)=%5.2fV\r", voltageReadings[0], voltageReadings[1], voltageReadings[2]);
+		
+			//Reset the voltages reading variables 
+			(*mCount) = 0;
+			voltageMeasurements[0] = 0;
+			voltageMeasurements[1] = 0;
+			voltageMeasurements[2] = 0;
+		}		
+	
+}
+
 void main (void) 
 {
 
@@ -331,7 +365,7 @@ void main (void)
 	
 	//Variables used to control the amount of measurements of the ADC to take before writing a voltage reading
 	int measureCount = 0;
-	int totalMeasurements = 500;
+	
 	
 	//Variables used to control the time between steps
 	int stepsInterruptCounter = 0;
@@ -386,35 +420,9 @@ void main (void)
 			stepFlag = 0;
 		}
 		
-		//Take the average of a given number of total measurements and print it out
-		if(measureCount < totalMeasurements)
-		{
-			//Add the current reading to the corresponding array position
-			voltages[0] += Volts_at_Pin(QFP32_MUX_P1_4);
-			voltages[1] += Volts_at_Pin(QFP32_MUX_P1_5);
-			voltages[2] += Volts_at_Pin(QFP32_MUX_P1_6);
-			
-			//Increase measureCount variable
-			measureCount++;
-		}
-		else
-		{
-			//Store the readings in separate variables that are only updated every 10 readings
-			vReadings[0] = voltages[0]/totalMeasurements;
-			vReadings[1] = voltages[1]/totalMeasurements;
-			vReadings[2] = voltages[2]/totalMeasurements;
-			
-			//Print the results to the terminal
-			printf("V(P1.4)=%4.2fV, V(P1.5)=%4.2fV, V(P1.6)=%5.2fV\r", vReadings[0], vReadings[1], vReadings[2]);
 		
-			//Reset the voltages reading variables 
-			measureCount = 0;
-			voltages[0] = 0;
-			voltages[1] = 0;
-			voltages[2] = 0;
-		}		
-		
-		
+		readADC(&measureCount, voltages, vReadings);
+
 	}
 	
 }

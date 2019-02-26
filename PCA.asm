@@ -1,7 +1,7 @@
 ;--------------------------------------------------------
 ; File Created by C51
 ; Version 1.0.0 #1069 (Apr 23 2015) (MSVC)
-; This file was generated Tue Feb 26 10:17:28 2019
+; This file was generated Tue Feb 26 10:47:27 2019
 ;--------------------------------------------------------
 $name PCA
 $optc51 --model-small
@@ -25,6 +25,7 @@ $printf_float
 ; Public variables in this module
 ;--------------------------------------------------------
 	public _main
+	public _readADC
 	public _ConfigurePins
 	public _takeStep
 	public _ConfigPCA0
@@ -36,6 +37,8 @@ $printf_float
 	public _Timer2_ISR
 	public _Timer3us
 	public __c51_external_startup
+	public _readADC_PARM_3
+	public _readADC_PARM_2
 	public _getsn_PARM_2
 	public _totalSteps
 	public _stepCount
@@ -500,22 +503,32 @@ _getsn_buff_1_51:
 	ds 3
 _getsn_sloc0_1_0:
 	ds 2
-_main_vReadings_1_71:
-	ds 12
-_main_voltages_1_71:
-	ds 12
-_main_dir_1_71:
+_readADC_PARM_2:
+	ds 3
+_readADC_PARM_3:
+	ds 3
+_readADC_mCount_1_70:
+	ds 3
+_readADC_sloc0_1_0:
 	ds 4
-_main_direction_1_71:
+_readADC_sloc1_1_0:
+	ds 4
+_readADC_sloc2_1_0:
+	ds 3
+_readADC_sloc3_1_0:
+	ds 3
+_readADC_sloc4_1_0:
+	ds 4
+_main_vReadings_1_75:
+	ds 12
+_main_voltages_1_75:
+	ds 12
+_main_dir_1_75:
+	ds 4
+_main_direction_1_75:
 	ds 1
-_main_measureCount_1_71:
+_main_measureCount_1_75:
 	ds 2
-_main_stepsInterruptCounter_1_71:
-	ds 2
-_main_sloc0_1_0:
-	ds 4
-_main_sloc1_1_0:
-	ds 4
 ;--------------------------------------------------------
 ; overlayable items in internal ram 
 ;--------------------------------------------------------
@@ -1251,32 +1264,456 @@ _ConfigurePins:
 	orl	_P1MDOUT,#0x80
 	ret
 ;------------------------------------------------------------
-;Allocation info for local variables in function 'main'
+;Allocation info for local variables in function 'readADC'
 ;------------------------------------------------------------
-;vReadings                 Allocated with name '_main_vReadings_1_71'
-;voltages                  Allocated with name '_main_voltages_1_71'
-;dir                       Allocated with name '_main_dir_1_71'
-;direction                 Allocated with name '_main_direction_1_71'
-;measureCount              Allocated with name '_main_measureCount_1_71'
+;voltageMeasurements       Allocated with name '_readADC_PARM_2'
+;voltageReadings           Allocated with name '_readADC_PARM_3'
+;mCount                    Allocated with name '_readADC_mCount_1_70'
 ;totalMeasurements         Allocated to registers 
-;stepsInterruptCounter     Allocated with name '_main_stepsInterruptCounter_1_71'
-;stepsTotalInterrupts      Allocated to registers 
-;sloc0                     Allocated with name '_main_sloc0_1_0'
-;sloc1                     Allocated with name '_main_sloc1_1_0'
+;sloc0                     Allocated with name '_readADC_sloc0_1_0'
+;sloc1                     Allocated with name '_readADC_sloc1_1_0'
+;sloc2                     Allocated with name '_readADC_sloc2_1_0'
+;sloc3                     Allocated with name '_readADC_sloc3_1_0'
+;sloc4                     Allocated with name '_readADC_sloc4_1_0'
 ;------------------------------------------------------------
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:321: void main (void) 
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:321: void readADC(int *mCount, float *voltageMeasurements, float *voltageReadings)
 ;	-----------------------------------------
-;	 function main
+;	 function readADC
 ;	-----------------------------------------
-_main:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:333: int measureCount = 0;
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:337: int stepsInterruptCounter = 0;
+_readADC:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:326: if((*mCount) < totalMeasurements)
+	mov	_readADC_mCount_1_70,dpl
+	mov	(_readADC_mCount_1_70 + 1),dph
+	mov	(_readADC_mCount_1_70 + 2),b
+	lcall	__gptrget
+	mov	r5,a
+	inc	dptr
+	lcall	__gptrget
+	mov	r6,a
+	clr	c
+	mov	a,r5
+	subb	a,#0xF4
+	mov	a,r6
+	xrl	a,#0x80
+	subb	a,#0x81
+	jc	L013007?
+	ljmp	L013002?
+L013007?:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:329: voltageMeasurements[0] += Volts_at_Pin(QFP32_MUX_P1_4);
+	mov	r5,_readADC_PARM_2
+	mov	r6,(_readADC_PARM_2 + 1)
+	mov	r7,(_readADC_PARM_2 + 2)
+	mov	dpl,r5
+	mov	dph,r6
+	mov	b,r7
+	lcall	__gptrget
+	mov	_readADC_sloc0_1_0,a
+	inc	dptr
+	lcall	__gptrget
+	mov	(_readADC_sloc0_1_0 + 1),a
+	inc	dptr
+	lcall	__gptrget
+	mov	(_readADC_sloc0_1_0 + 2),a
+	inc	dptr
+	lcall	__gptrget
+	mov	(_readADC_sloc0_1_0 + 3),a
+	mov	dpl,#0x0A
+	push	ar5
+	push	ar6
+	push	ar7
+	lcall	_Volts_at_Pin
+	mov	r4,dpl
+	mov	r2,dph
+	mov	r3,b
+	mov	r0,a
+	push	ar4
+	push	ar2
+	push	ar3
+	push	ar0
+	mov	dpl,_readADC_sloc0_1_0
+	mov	dph,(_readADC_sloc0_1_0 + 1)
+	mov	b,(_readADC_sloc0_1_0 + 2)
+	mov	a,(_readADC_sloc0_1_0 + 3)
+	lcall	___fsadd
+	mov	r2,dpl
+	mov	r3,dph
+	mov	r4,b
+	mov	r0,a
+	mov	a,sp
+	add	a,#0xfc
+	mov	sp,a
+	pop	ar7
+	pop	ar6
+	pop	ar5
+	mov	dpl,r5
+	mov	dph,r6
+	mov	b,r7
+	mov	a,r2
+	lcall	__gptrput
+	inc	dptr
+	mov	a,r3
+	lcall	__gptrput
+	inc	dptr
+	mov	a,r4
+	lcall	__gptrput
+	inc	dptr
+	mov	a,r0
+	lcall	__gptrput
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:330: voltageMeasurements[1] += Volts_at_Pin(QFP32_MUX_P1_5);
+	mov	a,#0x04
+	add	a,r5
+	mov	_readADC_sloc0_1_0,a
 	clr	a
-	mov	_main_measureCount_1_71,a
-	mov	(_main_measureCount_1_71 + 1),a
-	mov	_main_stepsInterruptCounter_1_71,a
-	mov	(_main_stepsInterruptCounter_1_71 + 1),a
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:340: printf("\x1b[2J"); // Clear screen using ANSI escape sequence.
+	addc	a,r6
+	mov	(_readADC_sloc0_1_0 + 1),a
+	mov	(_readADC_sloc0_1_0 + 2),r7
+	mov	dpl,_readADC_sloc0_1_0
+	mov	dph,(_readADC_sloc0_1_0 + 1)
+	mov	b,(_readADC_sloc0_1_0 + 2)
+	lcall	__gptrget
+	mov	_readADC_sloc1_1_0,a
+	inc	dptr
+	lcall	__gptrget
+	mov	(_readADC_sloc1_1_0 + 1),a
+	inc	dptr
+	lcall	__gptrget
+	mov	(_readADC_sloc1_1_0 + 2),a
+	inc	dptr
+	lcall	__gptrget
+	mov	(_readADC_sloc1_1_0 + 3),a
+	mov	dpl,#0x0B
+	push	ar5
+	push	ar6
+	push	ar7
+	lcall	_Volts_at_Pin
+	mov	r4,dpl
+	mov	r2,dph
+	mov	r3,b
+	mov	r0,a
+	push	ar4
+	push	ar2
+	push	ar3
+	push	ar0
+	mov	dpl,_readADC_sloc1_1_0
+	mov	dph,(_readADC_sloc1_1_0 + 1)
+	mov	b,(_readADC_sloc1_1_0 + 2)
+	mov	a,(_readADC_sloc1_1_0 + 3)
+	lcall	___fsadd
+	mov	r2,dpl
+	mov	r3,dph
+	mov	r4,b
+	mov	r0,a
+	mov	a,sp
+	add	a,#0xfc
+	mov	sp,a
+	pop	ar7
+	pop	ar6
+	pop	ar5
+	mov	dpl,_readADC_sloc0_1_0
+	mov	dph,(_readADC_sloc0_1_0 + 1)
+	mov	b,(_readADC_sloc0_1_0 + 2)
+	mov	a,r2
+	lcall	__gptrput
+	inc	dptr
+	mov	a,r3
+	lcall	__gptrput
+	inc	dptr
+	mov	a,r4
+	lcall	__gptrput
+	inc	dptr
+	mov	a,r0
+	lcall	__gptrput
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:331: voltageMeasurements[2] += Volts_at_Pin(QFP32_MUX_P1_6);
+	mov	a,#0x08
+	add	a,r5
+	mov	r5,a
+	clr	a
+	addc	a,r6
+	mov	r6,a
+	mov	dpl,r5
+	mov	dph,r6
+	mov	b,r7
+	lcall	__gptrget
+	mov	_readADC_sloc1_1_0,a
+	inc	dptr
+	lcall	__gptrget
+	mov	(_readADC_sloc1_1_0 + 1),a
+	inc	dptr
+	lcall	__gptrget
+	mov	(_readADC_sloc1_1_0 + 2),a
+	inc	dptr
+	lcall	__gptrget
+	mov	(_readADC_sloc1_1_0 + 3),a
+	mov	dpl,#0x0C
+	push	ar5
+	push	ar6
+	push	ar7
+	lcall	_Volts_at_Pin
+	mov	r1,dpl
+	mov	r2,dph
+	mov	r3,b
+	mov	r4,a
+	push	ar1
+	push	ar2
+	push	ar3
+	push	ar4
+	mov	dpl,_readADC_sloc1_1_0
+	mov	dph,(_readADC_sloc1_1_0 + 1)
+	mov	b,(_readADC_sloc1_1_0 + 2)
+	mov	a,(_readADC_sloc1_1_0 + 3)
+	lcall	___fsadd
+	mov	r2,dpl
+	mov	r3,dph
+	mov	r4,b
+	mov	r0,a
+	mov	a,sp
+	add	a,#0xfc
+	mov	sp,a
+	pop	ar7
+	pop	ar6
+	pop	ar5
+	mov	dpl,r5
+	mov	dph,r6
+	mov	b,r7
+	mov	a,r2
+	lcall	__gptrput
+	inc	dptr
+	mov	a,r3
+	lcall	__gptrput
+	inc	dptr
+	mov	a,r4
+	lcall	__gptrput
+	inc	dptr
+	mov	a,r0
+	lcall	__gptrput
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:334: (*mCount)++;
+	mov	dpl,_readADC_mCount_1_70
+	mov	dph,(_readADC_mCount_1_70 + 1)
+	mov	b,(_readADC_mCount_1_70 + 2)
+	lcall	__gptrget
+	mov	r2,a
+	inc	dptr
+	lcall	__gptrget
+	mov	r3,a
+	inc	r2
+	cjne	r2,#0x00,L013008?
+	inc	r3
+L013008?:
+	mov	dpl,_readADC_mCount_1_70
+	mov	dph,(_readADC_mCount_1_70 + 1)
+	mov	b,(_readADC_mCount_1_70 + 2)
+	mov	a,r2
+	lcall	__gptrput
+	inc	dptr
+	mov	a,r3
+	ljmp	__gptrput
+L013002?:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:339: voltageReadings[0] = voltageMeasurements[0]/totalMeasurements;
+	mov	_readADC_sloc1_1_0,_readADC_PARM_3
+	mov	(_readADC_sloc1_1_0 + 1),(_readADC_PARM_3 + 1)
+	mov	(_readADC_sloc1_1_0 + 2),(_readADC_PARM_3 + 2)
+	mov	r5,_readADC_PARM_2
+	mov	r6,(_readADC_PARM_2 + 1)
+	mov	r7,(_readADC_PARM_2 + 2)
+	mov	dpl,r5
+	mov	dph,r6
+	mov	b,r7
+	lcall	__gptrget
+	mov	r0,a
+	inc	dptr
+	lcall	__gptrget
+	mov	r1,a
+	inc	dptr
+	lcall	__gptrget
+	mov	r2,a
+	inc	dptr
+	lcall	__gptrget
+	mov	r3,a
+	push	ar5
+	push	ar6
+	push	ar7
+	clr	a
+	push	acc
+	push	acc
+	mov	a,#0xFA
+	push	acc
+	mov	a,#0x43
+	push	acc
+	mov	dpl,r0
+	mov	dph,r1
+	mov	b,r2
+	mov	a,r3
+	lcall	___fsdiv
+	mov	_readADC_sloc0_1_0,dpl
+	mov	(_readADC_sloc0_1_0 + 1),dph
+	mov	(_readADC_sloc0_1_0 + 2),b
+	mov	(_readADC_sloc0_1_0 + 3),a
+	mov	a,sp
+	add	a,#0xfc
+	mov	sp,a
+	pop	ar7
+	pop	ar6
+	pop	ar5
+	mov	dpl,_readADC_sloc1_1_0
+	mov	dph,(_readADC_sloc1_1_0 + 1)
+	mov	b,(_readADC_sloc1_1_0 + 2)
+	mov	a,_readADC_sloc0_1_0
+	lcall	__gptrput
+	inc	dptr
+	mov	a,(_readADC_sloc0_1_0 + 1)
+	lcall	__gptrput
+	inc	dptr
+	mov	a,(_readADC_sloc0_1_0 + 2)
+	lcall	__gptrput
+	inc	dptr
+	mov	a,(_readADC_sloc0_1_0 + 3)
+	lcall	__gptrput
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:340: voltageReadings[1] = voltageMeasurements[1]/totalMeasurements;
+	mov	a,#0x04
+	add	a,_readADC_sloc1_1_0
+	mov	_readADC_sloc2_1_0,a
+	clr	a
+	addc	a,(_readADC_sloc1_1_0 + 1)
+	mov	(_readADC_sloc2_1_0 + 1),a
+	mov	(_readADC_sloc2_1_0 + 2),(_readADC_sloc1_1_0 + 2)
+	mov	a,#0x04
+	add	a,r5
+	mov	_readADC_sloc3_1_0,a
+	clr	a
+	addc	a,r6
+	mov	(_readADC_sloc3_1_0 + 1),a
+	mov	(_readADC_sloc3_1_0 + 2),r7
+	mov	dpl,_readADC_sloc3_1_0
+	mov	dph,(_readADC_sloc3_1_0 + 1)
+	mov	b,(_readADC_sloc3_1_0 + 2)
+	lcall	__gptrget
+	mov	r3,a
+	inc	dptr
+	lcall	__gptrget
+	mov	r1,a
+	inc	dptr
+	lcall	__gptrget
+	mov	r2,a
+	inc	dptr
+	lcall	__gptrget
+	mov	r4,a
+	push	ar5
+	push	ar6
+	push	ar7
+	clr	a
+	push	acc
+	push	acc
+	mov	a,#0xFA
+	push	acc
+	mov	a,#0x43
+	push	acc
+	mov	dpl,r3
+	mov	dph,r1
+	mov	b,r2
+	mov	a,r4
+	lcall	___fsdiv
+	mov	_readADC_sloc4_1_0,dpl
+	mov	(_readADC_sloc4_1_0 + 1),dph
+	mov	(_readADC_sloc4_1_0 + 2),b
+	mov	(_readADC_sloc4_1_0 + 3),a
+	mov	a,sp
+	add	a,#0xfc
+	mov	sp,a
+	pop	ar7
+	pop	ar6
+	pop	ar5
+	mov	dpl,_readADC_sloc2_1_0
+	mov	dph,(_readADC_sloc2_1_0 + 1)
+	mov	b,(_readADC_sloc2_1_0 + 2)
+	mov	a,_readADC_sloc4_1_0
+	lcall	__gptrput
+	inc	dptr
+	mov	a,(_readADC_sloc4_1_0 + 1)
+	lcall	__gptrput
+	inc	dptr
+	mov	a,(_readADC_sloc4_1_0 + 2)
+	lcall	__gptrput
+	inc	dptr
+	mov	a,(_readADC_sloc4_1_0 + 3)
+	lcall	__gptrput
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:341: voltageReadings[2] = voltageMeasurements[2]/totalMeasurements;
+	mov	a,#0x08
+	add	a,_readADC_sloc1_1_0
+	mov	_readADC_sloc2_1_0,a
+	clr	a
+	addc	a,(_readADC_sloc1_1_0 + 1)
+	mov	(_readADC_sloc2_1_0 + 1),a
+	mov	(_readADC_sloc2_1_0 + 2),(_readADC_sloc1_1_0 + 2)
+	mov	a,#0x08
+	add	a,r5
+	mov	_readADC_sloc1_1_0,a
+	clr	a
+	addc	a,r6
+	mov	(_readADC_sloc1_1_0 + 1),a
+	mov	(_readADC_sloc1_1_0 + 2),r7
+	mov	dpl,_readADC_sloc1_1_0
+	mov	dph,(_readADC_sloc1_1_0 + 1)
+	mov	b,(_readADC_sloc1_1_0 + 2)
+	lcall	__gptrget
+	mov	r3,a
+	inc	dptr
+	lcall	__gptrget
+	mov	r1,a
+	inc	dptr
+	lcall	__gptrget
+	mov	r2,a
+	inc	dptr
+	lcall	__gptrget
+	mov	r4,a
+	push	ar5
+	push	ar6
+	push	ar7
+	clr	a
+	push	acc
+	push	acc
+	mov	a,#0xFA
+	push	acc
+	mov	a,#0x43
+	push	acc
+	mov	dpl,r3
+	mov	dph,r1
+	mov	b,r2
+	mov	a,r4
+	lcall	___fsdiv
+	mov	r2,dpl
+	mov	r3,dph
+	mov	r4,b
+	mov	r0,a
+	mov	a,sp
+	add	a,#0xfc
+	mov	sp,a
+	mov	dpl,_readADC_sloc2_1_0
+	mov	dph,(_readADC_sloc2_1_0 + 1)
+	mov	b,(_readADC_sloc2_1_0 + 2)
+	mov	a,r2
+	lcall	__gptrput
+	inc	dptr
+	mov	a,r3
+	lcall	__gptrput
+	inc	dptr
+	mov	a,r4
+	lcall	__gptrput
+	inc	dptr
+	mov	a,r0
+	lcall	__gptrput
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:344: printf("V(P1.4)=%4.2fV, V(P1.5)=%4.2fV, V(P1.6)=%5.2fV\r", voltageReadings[0], voltageReadings[1], voltageReadings[2]);
+	push	ar2
+	push	ar3
+	push	ar4
+	push	ar0
+	push	_readADC_sloc4_1_0
+	push	(_readADC_sloc4_1_0 + 1)
+	push	(_readADC_sloc4_1_0 + 2)
+	push	(_readADC_sloc4_1_0 + 3)
+	push	_readADC_sloc0_1_0
+	push	(_readADC_sloc0_1_0 + 1)
+	push	(_readADC_sloc0_1_0 + 2)
+	push	(_readADC_sloc0_1_0 + 3)
 	mov	a,#__str_0
 	push	acc
 	mov	a,#(__str_0 >> 8)
@@ -1284,12 +1721,92 @@ _main:
 	mov	a,#0x80
 	push	acc
 	lcall	_printf
-	dec	sp
-	dec	sp
-	dec	sp
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:342: ConfigurePins();
-	lcall	_ConfigurePins
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:343: printf("Pin configuration done.\n");
+	mov	a,sp
+	add	a,#0xf1
+	mov	sp,a
+	pop	ar7
+	pop	ar6
+	pop	ar5
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:347: (*mCount) = 0;
+	mov	dpl,_readADC_mCount_1_70
+	mov	dph,(_readADC_mCount_1_70 + 1)
+	mov	b,(_readADC_mCount_1_70 + 2)
+	clr	a
+	lcall	__gptrput
+	inc	dptr
+	clr	a
+	lcall	__gptrput
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:348: voltageMeasurements[0] = 0;
+	mov	dpl,r5
+	mov	dph,r6
+	mov	b,r7
+	clr	a
+	lcall	__gptrput
+	inc	dptr
+	clr	a
+	lcall	__gptrput
+	inc	dptr
+	clr	a
+	lcall	__gptrput
+	inc	dptr
+	clr	a
+	lcall	__gptrput
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:349: voltageMeasurements[1] = 0;
+	mov	dpl,_readADC_sloc3_1_0
+	mov	dph,(_readADC_sloc3_1_0 + 1)
+	mov	b,(_readADC_sloc3_1_0 + 2)
+	clr	a
+	lcall	__gptrput
+	inc	dptr
+	clr	a
+	lcall	__gptrput
+	inc	dptr
+	clr	a
+	lcall	__gptrput
+	inc	dptr
+	clr	a
+	lcall	__gptrput
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:350: voltageMeasurements[2] = 0;
+	mov	dpl,_readADC_sloc1_1_0
+	mov	dph,(_readADC_sloc1_1_0 + 1)
+	mov	b,(_readADC_sloc1_1_0 + 2)
+	clr	a
+	lcall	__gptrput
+	inc	dptr
+	clr	a
+	lcall	__gptrput
+	inc	dptr
+	clr	a
+	lcall	__gptrput
+	inc	dptr
+	clr	a
+	ljmp	__gptrput
+;------------------------------------------------------------
+;Allocation info for local variables in function 'main'
+;------------------------------------------------------------
+;vReadings                 Allocated with name '_main_vReadings_1_75'
+;voltages                  Allocated with name '_main_voltages_1_75'
+;dir                       Allocated with name '_main_dir_1_75'
+;direction                 Allocated with name '_main_direction_1_75'
+;measureCount              Allocated with name '_main_measureCount_1_75'
+;stepsInterruptCounter     Allocated to registers r2 r3 
+;stepsTotalInterrupts      Allocated to registers 
+;------------------------------------------------------------
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:355: void main (void) 
+;	-----------------------------------------
+;	 function main
+;	-----------------------------------------
+_main:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:367: int measureCount = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:371: int stepsInterruptCounter = 0;
+	clr	a
+	mov	_main_measureCount_1_75,a
+	mov	(_main_measureCount_1_75 + 1),a
+	mov	r2,a
+	mov	r3,a
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:374: printf("\x1b[2J"); // Clear screen using ANSI escape sequence.
+	push	ar2
+	push	ar3
 	mov	a,#__str_1
 	push	acc
 	mov	a,#(__str_1 >> 8)
@@ -1300,9 +1817,9 @@ _main:
 	dec	sp
 	dec	sp
 	dec	sp
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:345: ConfigPCA0();
-	lcall	_ConfigPCA0
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:346: printf("PCA configuration done.\n");
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:376: ConfigurePins();
+	lcall	_ConfigurePins
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:377: printf("Pin configuration done.\n");
 	mov	a,#__str_2
 	push	acc
 	mov	a,#(__str_2 >> 8)
@@ -1313,9 +1830,9 @@ _main:
 	dec	sp
 	dec	sp
 	dec	sp
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:348: InitADC();
-	lcall	_InitADC
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:349: printf("ADC configuration done.\n");
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:379: ConfigPCA0();
+	lcall	_ConfigPCA0
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:380: printf("PCA configuration done.\n");
 	mov	a,#__str_3
 	push	acc
 	mov	a,#(__str_3 >> 8)
@@ -1326,7 +1843,9 @@ _main:
 	dec	sp
 	dec	sp
 	dec	sp
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:351: printf("\n");
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:382: InitADC();
+	lcall	_InitADC
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:383: printf("ADC configuration done.\n");
 	mov	a,#__str_4
 	push	acc
 	mov	a,#(__str_4 >> 8)
@@ -1337,7 +1856,7 @@ _main:
 	dec	sp
 	dec	sp
 	dec	sp
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:353: printf("Enter direction of rotation:\n");
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:385: printf("\n");
 	mov	a,#__str_5
 	push	acc
 	mov	a,#(__str_5 >> 8)
@@ -1348,43 +1867,10 @@ _main:
 	dec	sp
 	dec	sp
 	dec	sp
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:354: getsn(dir,sizeof(dir));
-	mov	_getsn_PARM_2,#0x04
-	clr	a
-	mov	(_getsn_PARM_2 + 1),a
-	mov	dptr,#_main_dir_1_71
-	mov	b,#0x40
-	lcall	_getsn
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:356: sscanf(dir,"%c",&direction);
-	mov	a,#_main_direction_1_71
-	push	acc
-	mov	a,#(_main_direction_1_71 >> 8)
-	push	acc
-	mov	a,#0x40
-	push	acc
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:387: printf("Enter direction of rotation:\n");
 	mov	a,#__str_6
 	push	acc
 	mov	a,#(__str_6 >> 8)
-	push	acc
-	mov	a,#0x80
-	push	acc
-	mov	a,#_main_dir_1_71
-	push	acc
-	mov	a,#(_main_dir_1_71 >> 8)
-	push	acc
-	mov	a,#0x40
-	push	acc
-	lcall	_sscanf
-	mov	a,sp
-	add	a,#0xf7
-	mov	sp,a
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:358: if(direction == 'F')
-	mov	a,#0x46
-	cjne	a,_main_direction_1_71,L013002?
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:359: printf("Moving forward.\n");
-	mov	a,#__str_7
-	push	acc
-	mov	a,#(__str_7 >> 8)
 	push	acc
 	mov	a,#0x80
 	push	acc
@@ -1392,9 +1878,44 @@ _main:
 	dec	sp
 	dec	sp
 	dec	sp
-	sjmp	L013013?
-L013002?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:361: printf("Moving backwards.\n");
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:388: getsn(dir,sizeof(dir));
+	mov	_getsn_PARM_2,#0x04
+	clr	a
+	mov	(_getsn_PARM_2 + 1),a
+	mov	dptr,#_main_dir_1_75
+	mov	b,#0x40
+	lcall	_getsn
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:390: sscanf(dir,"%c",&direction);
+	mov	a,#_main_direction_1_75
+	push	acc
+	mov	a,#(_main_direction_1_75 >> 8)
+	push	acc
+	mov	a,#0x40
+	push	acc
+	mov	a,#__str_7
+	push	acc
+	mov	a,#(__str_7 >> 8)
+	push	acc
+	mov	a,#0x80
+	push	acc
+	mov	a,#_main_dir_1_75
+	push	acc
+	mov	a,#(_main_dir_1_75 >> 8)
+	push	acc
+	mov	a,#0x40
+	push	acc
+	lcall	_sscanf
+	mov	a,sp
+	add	a,#0xf7
+	mov	sp,a
+	pop	ar3
+	pop	ar2
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:392: if(direction == 'F')
+	mov	a,#0x46
+	cjne	a,_main_direction_1_75,L014002?
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:393: printf("Moving forward.\n");
+	push	ar2
+	push	ar3
 	mov	a,#__str_8
 	push	acc
 	mov	a,#(__str_8 >> 8)
@@ -1405,235 +1926,13 @@ L013002?:
 	dec	sp
 	dec	sp
 	dec	sp
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:364: while(1) //Main loop of the program begins here
-L013013?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:369: if(stepFlag == 1)
-	mov	a,#0x01
-	cjne	a,_stepFlag,L013008?
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:373: if(stepsInterruptCounter < stepsTotalInterrupts)
-	clr	c
-	mov	a,_main_stepsInterruptCounter_1_71
-	subb	a,#0x0F
-	mov	a,(_main_stepsInterruptCounter_1_71 + 1)
-	xrl	a,#0x80
-	subb	a,#0x80
-	jnc	L013005?
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:374: stepsInterruptCounter++;
-	inc	_main_stepsInterruptCounter_1_71
-	clr	a
-	cjne	a,_main_stepsInterruptCounter_1_71,L013006?
-	inc	(_main_stepsInterruptCounter_1_71 + 1)
-	sjmp	L013006?
-L013005?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:377: takeStep(direction);
-	mov	dpl,_main_direction_1_71
-	lcall	_takeStep
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:379: TIMER_OUT_2 = !TIMER_OUT_2; //For testing purposes
-	cpl	_P2_5
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:382: stepsInterruptCounter = 0;
-	clr	a
-	mov	_main_stepsInterruptCounter_1_71,a
-	mov	(_main_stepsInterruptCounter_1_71 + 1),a
-L013006?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:386: stepFlag = 0;
-	mov	_stepFlag,#0x00
-L013008?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:390: if(measureCount < totalMeasurements)
-	clr	c
-	mov	a,_main_measureCount_1_71
-	subb	a,#0xF4
-	mov	a,(_main_measureCount_1_71 + 1)
-	xrl	a,#0x80
-	subb	a,#0x81
-	jc	L013028?
-	ljmp	L013010?
-L013028?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:393: voltages[0] += Volts_at_Pin(QFP32_MUX_P1_4);
-	mov	_main_sloc0_1_0,_main_voltages_1_71
-	mov	(_main_sloc0_1_0 + 1),(_main_voltages_1_71 + 1)
-	mov	(_main_sloc0_1_0 + 2),(_main_voltages_1_71 + 2)
-	mov	(_main_sloc0_1_0 + 3),(_main_voltages_1_71 + 3)
-	mov	dpl,#0x0A
-	lcall	_Volts_at_Pin
-	mov	r2,dpl
-	mov	r3,dph
-	mov	r4,b
-	mov	r5,a
+	pop	ar3
+	pop	ar2
+	sjmp	L014010?
+L014002?:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:395: printf("Moving backwards.\n");
 	push	ar2
 	push	ar3
-	push	ar4
-	push	ar5
-	mov	dpl,_main_sloc0_1_0
-	mov	dph,(_main_sloc0_1_0 + 1)
-	mov	b,(_main_sloc0_1_0 + 2)
-	mov	a,(_main_sloc0_1_0 + 3)
-	lcall	___fsadd
-	mov	r2,dpl
-	mov	r3,dph
-	mov	r4,b
-	mov	r5,a
-	mov	a,sp
-	add	a,#0xfc
-	mov	sp,a
-	mov	_main_voltages_1_71,r2
-	mov	(_main_voltages_1_71 + 1),r3
-	mov	(_main_voltages_1_71 + 2),r4
-	mov	(_main_voltages_1_71 + 3),r5
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:394: voltages[1] += Volts_at_Pin(QFP32_MUX_P1_5);
-	mov	_main_sloc0_1_0,(_main_voltages_1_71 + 0x0004)
-	mov	(_main_sloc0_1_0 + 1),((_main_voltages_1_71 + 0x0004) + 1)
-	mov	(_main_sloc0_1_0 + 2),((_main_voltages_1_71 + 0x0004) + 2)
-	mov	(_main_sloc0_1_0 + 3),((_main_voltages_1_71 + 0x0004) + 3)
-	mov	dpl,#0x0B
-	lcall	_Volts_at_Pin
-	mov	r6,dpl
-	mov	r7,dph
-	mov	r2,b
-	mov	r3,a
-	push	ar6
-	push	ar7
-	push	ar2
-	push	ar3
-	mov	dpl,_main_sloc0_1_0
-	mov	dph,(_main_sloc0_1_0 + 1)
-	mov	b,(_main_sloc0_1_0 + 2)
-	mov	a,(_main_sloc0_1_0 + 3)
-	lcall	___fsadd
-	mov	r2,dpl
-	mov	r3,dph
-	mov	r4,b
-	mov	r5,a
-	mov	a,sp
-	add	a,#0xfc
-	mov	sp,a
-	mov	(_main_voltages_1_71 + 0x0004),r2
-	mov	((_main_voltages_1_71 + 0x0004) + 1),r3
-	mov	((_main_voltages_1_71 + 0x0004) + 2),r4
-	mov	((_main_voltages_1_71 + 0x0004) + 3),r5
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:395: voltages[2] += Volts_at_Pin(QFP32_MUX_P1_6);
-	mov	_main_sloc0_1_0,(_main_voltages_1_71 + 0x0008)
-	mov	(_main_sloc0_1_0 + 1),((_main_voltages_1_71 + 0x0008) + 1)
-	mov	(_main_sloc0_1_0 + 2),((_main_voltages_1_71 + 0x0008) + 2)
-	mov	(_main_sloc0_1_0 + 3),((_main_voltages_1_71 + 0x0008) + 3)
-	mov	dpl,#0x0C
-	lcall	_Volts_at_Pin
-	mov	r6,dpl
-	mov	r7,dph
-	mov	r2,b
-	mov	r3,a
-	push	ar6
-	push	ar7
-	push	ar2
-	push	ar3
-	mov	dpl,_main_sloc0_1_0
-	mov	dph,(_main_sloc0_1_0 + 1)
-	mov	b,(_main_sloc0_1_0 + 2)
-	mov	a,(_main_sloc0_1_0 + 3)
-	lcall	___fsadd
-	mov	r2,dpl
-	mov	r3,dph
-	mov	r4,b
-	mov	r5,a
-	mov	a,sp
-	add	a,#0xfc
-	mov	sp,a
-	mov	(_main_voltages_1_71 + 0x0008),r2
-	mov	((_main_voltages_1_71 + 0x0008) + 1),r3
-	mov	((_main_voltages_1_71 + 0x0008) + 2),r4
-	mov	((_main_voltages_1_71 + 0x0008) + 3),r5
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:398: measureCount++;
-	inc	_main_measureCount_1_71
-	clr	a
-	cjne	a,_main_measureCount_1_71,L013029?
-	inc	(_main_measureCount_1_71 + 1)
-L013029?:
-	ljmp	L013013?
-L013010?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:403: vReadings[0] = voltages[0]/totalMeasurements;
-	clr	a
-	push	acc
-	push	acc
-	mov	a,#0xFA
-	push	acc
-	mov	a,#0x43
-	push	acc
-	mov	dpl,_main_voltages_1_71
-	mov	dph,(_main_voltages_1_71 + 1)
-	mov	b,(_main_voltages_1_71 + 2)
-	mov	a,(_main_voltages_1_71 + 3)
-	lcall	___fsdiv
-	mov	_main_sloc0_1_0,dpl
-	mov	(_main_sloc0_1_0 + 1),dph
-	mov	(_main_sloc0_1_0 + 2),b
-	mov	(_main_sloc0_1_0 + 3),a
-	mov	a,sp
-	add	a,#0xfc
-	mov	sp,a
-	mov	_main_vReadings_1_71,_main_sloc0_1_0
-	mov	(_main_vReadings_1_71 + 1),(_main_sloc0_1_0 + 1)
-	mov	(_main_vReadings_1_71 + 2),(_main_sloc0_1_0 + 2)
-	mov	(_main_vReadings_1_71 + 3),(_main_sloc0_1_0 + 3)
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:404: vReadings[1] = voltages[1]/totalMeasurements;
-	clr	a
-	push	acc
-	push	acc
-	mov	a,#0xFA
-	push	acc
-	mov	a,#0x43
-	push	acc
-	mov	dpl,(_main_voltages_1_71 + 0x0004)
-	mov	dph,((_main_voltages_1_71 + 0x0004) + 1)
-	mov	b,((_main_voltages_1_71 + 0x0004) + 2)
-	mov	a,((_main_voltages_1_71 + 0x0004) + 3)
-	lcall	___fsdiv
-	mov	_main_sloc1_1_0,dpl
-	mov	(_main_sloc1_1_0 + 1),dph
-	mov	(_main_sloc1_1_0 + 2),b
-	mov	(_main_sloc1_1_0 + 3),a
-	mov	a,sp
-	add	a,#0xfc
-	mov	sp,a
-	mov	(_main_vReadings_1_71 + 0x0004),_main_sloc1_1_0
-	mov	((_main_vReadings_1_71 + 0x0004) + 1),(_main_sloc1_1_0 + 1)
-	mov	((_main_vReadings_1_71 + 0x0004) + 2),(_main_sloc1_1_0 + 2)
-	mov	((_main_vReadings_1_71 + 0x0004) + 3),(_main_sloc1_1_0 + 3)
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:405: vReadings[2] = voltages[2]/totalMeasurements;
-	clr	a
-	push	acc
-	push	acc
-	mov	a,#0xFA
-	push	acc
-	mov	a,#0x43
-	push	acc
-	mov	dpl,(_main_voltages_1_71 + 0x0008)
-	mov	dph,((_main_voltages_1_71 + 0x0008) + 1)
-	mov	b,((_main_voltages_1_71 + 0x0008) + 2)
-	mov	a,((_main_voltages_1_71 + 0x0008) + 3)
-	lcall	___fsdiv
-	mov	r4,dpl
-	mov	r5,dph
-	mov	r2,b
-	mov	r3,a
-	mov	a,sp
-	add	a,#0xfc
-	mov	sp,a
-	mov	(_main_vReadings_1_71 + 0x0008),r4
-	mov	((_main_vReadings_1_71 + 0x0008) + 1),r5
-	mov	((_main_vReadings_1_71 + 0x0008) + 2),r2
-	mov	((_main_vReadings_1_71 + 0x0008) + 3),r3
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:408: printf("V(P1.4)=%4.2fV, V(P1.5)=%4.2fV, V(P1.6)=%5.2fV\r", vReadings[0], vReadings[1], vReadings[2]);
-	push	ar4
-	push	ar5
-	push	ar2
-	push	ar3
-	push	_main_sloc1_1_0
-	push	(_main_sloc1_1_0 + 1)
-	push	(_main_sloc1_1_0 + 2)
-	push	(_main_sloc1_1_0 + 3)
-	push	_main_sloc0_1_0
-	push	(_main_sloc0_1_0 + 1)
-	push	(_main_sloc0_1_0 + 2)
-	push	(_main_sloc0_1_0 + 3)
 	mov	a,#__str_9
 	push	acc
 	mov	a,#(__str_9 >> 8)
@@ -1641,71 +1940,99 @@ L013010?:
 	mov	a,#0x80
 	push	acc
 	lcall	_printf
-	mov	a,sp
-	add	a,#0xf1
-	mov	sp,a
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:411: measureCount = 0;
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:412: voltages[0] = 0;
-	clr a
-	mov _main_measureCount_1_71,a
-	mov (_main_measureCount_1_71 + 1),a
-	mov _main_voltages_1_71,a
-	mov (_main_voltages_1_71 + 1),a
-	mov (_main_voltages_1_71 + 2),a
-	mov (_main_voltages_1_71 + 3),a
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:413: voltages[1] = 0;
-	mov	(_main_voltages_1_71 + 0x0004),#0x00
-	mov	((_main_voltages_1_71 + 0x0004) + 1),#0x00
-	mov	((_main_voltages_1_71 + 0x0004) + 2),#0x00
-	mov	((_main_voltages_1_71 + 0x0004) + 3),#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:414: voltages[2] = 0;
-	mov	(_main_voltages_1_71 + 0x0008),#0x00
-	mov	((_main_voltages_1_71 + 0x0008) + 1),#0x00
-	mov	((_main_voltages_1_71 + 0x0008) + 2),#0x00
-	mov	((_main_voltages_1_71 + 0x0008) + 3),#0x00
-	ljmp	L013013?
+	dec	sp
+	dec	sp
+	dec	sp
+	pop	ar3
+	pop	ar2
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:398: while(1) //Main loop of the program begins here
+L014010?:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:403: if(stepFlag == 1)
+	mov	a,#0x01
+	cjne	a,_stepFlag,L014008?
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:407: if(stepsInterruptCounter < stepsTotalInterrupts)
+	clr	c
+	mov	a,r2
+	subb	a,#0x0F
+	mov	a,r3
+	xrl	a,#0x80
+	subb	a,#0x80
+	jnc	L014005?
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:408: stepsInterruptCounter++;
+	inc	r2
+	cjne	r2,#0x00,L014006?
+	inc	r3
+	sjmp	L014006?
+L014005?:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:411: takeStep(direction);
+	mov	dpl,_main_direction_1_75
+	lcall	_takeStep
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:413: TIMER_OUT_2 = !TIMER_OUT_2; //For testing purposes
+	cpl	_P2_5
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:416: stepsInterruptCounter = 0;
+	mov	r2,#0x00
+	mov	r3,#0x00
+L014006?:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:420: stepFlag = 0;
+	mov	_stepFlag,#0x00
+L014008?:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:424: readADC(&measureCount, voltages, vReadings);
+	mov	_readADC_PARM_2,#_main_voltages_1_75
+	mov	(_readADC_PARM_2 + 1),#0x00
+	mov	(_readADC_PARM_2 + 2),#0x40
+	mov	_readADC_PARM_3,#_main_vReadings_1_75
+	mov	(_readADC_PARM_3 + 1),#0x00
+	mov	(_readADC_PARM_3 + 2),#0x40
+	mov	dptr,#_main_measureCount_1_75
+	mov	b,#0x40
+	push	ar2
+	push	ar3
+	lcall	_readADC
+	pop	ar3
+	pop	ar2
+	sjmp	L014010?
 	rseg R_CSEG
 
 	rseg R_XINIT
 
 	rseg R_CONST
 __str_0:
+	db 'V(P1.4)=%4.2fV, V(P1.5)=%4.2fV, V(P1.6)=%5.2fV'
+	db 0x0D
+	db 0x00
+__str_1:
 	db 0x1B
 	db '[2J'
 	db 0x00
-__str_1:
+__str_2:
 	db 'Pin configuration done.'
 	db 0x0A
 	db 0x00
-__str_2:
+__str_3:
 	db 'PCA configuration done.'
 	db 0x0A
 	db 0x00
-__str_3:
+__str_4:
 	db 'ADC configuration done.'
 	db 0x0A
 	db 0x00
-__str_4:
-	db 0x0A
-	db 0x00
 __str_5:
-	db 'Enter direction of rotation:'
 	db 0x0A
 	db 0x00
 __str_6:
-	db '%c'
+	db 'Enter direction of rotation:'
+	db 0x0A
 	db 0x00
 __str_7:
+	db '%c'
+	db 0x00
+__str_8:
 	db 'Moving forward.'
 	db 0x0A
 	db 0x00
-__str_8:
+__str_9:
 	db 'Moving backwards.'
 	db 0x0A
-	db 0x00
-__str_9:
-	db 'V(P1.4)=%4.2fV, V(P1.5)=%4.2fV, V(P1.6)=%5.2fV'
-	db 0x0D
 	db 0x00
 
 	CSEG

@@ -5,7 +5,7 @@ PCA.c: Configures the PCA for operation in PWM mode and
 outputs a PWM signal through one of the available modules
 
 EFM8LB1 configuration code, ADC setup code and timer setup code provided by
-Professor Jesus Calviño-Fraga from the University of British Columbia.
+Professor Jesus Calvino-Fraga from the University of British Columbia.
 
 */
 
@@ -26,14 +26,17 @@ Professor Jesus Calviño-Fraga from the University of British Columbia.
 #define VDD 3.291 
 
 //Timer 2 default frequency (used to control time between steps)
-#define TIMER_2_FREQ 800L //Generate interrupts every 1.25ms
+#define TIMER_2_FREQ 1000L //Generate interrupts every 1.25ms
 #define TIMER_3_FREQ 2000L //Generate interrupts every 0.5ms
 
 #define TIMER_OUT_2 P2_5 //Timer 2 output pin (FOR TESTING ONLY, WILL BE REMOVED LATER)
 
-volatile unsigned char stepFlag = 1;
+volatile unsigned char adcFlag = 1;
+volatile unsigned char direction = 1;
 
-int stepCount = 0;
+volatile unsigned char stepCount = 0;
+volatile unsigned char interruptCount = 0;
+
 int totalSteps = 0;
 
 char _c51_external_startup (void)
@@ -125,16 +128,92 @@ char _c51_external_startup (void)
 	return 0;
 }
 
-//Timer 2 will control the time between steps for the stepper motor
+//Timer 2 drives the stepper motor
 void Timer2_ISR (void) interrupt INTERRUPT_TIMER2
 {
 	SFRPAGE=0x0;
 	TF2H = 0; // Clear Timer2 interrupt flag
 	
-	TIMER_OUT_2=!TIMER_OUT_2;
-	
-	stepFlag = 1;
-	
+	//--------------------------------
+	//Motor control
+	//--------------------------------
+	if(interruptCount == 3)
+	{
+		TIMER_OUT_2 = !TIMER_OUT_2;
+		interruptCount = 0;
+		if(direction == 1)
+		{
+			if(stepCount == 0)
+			{
+				PORT1 = 1;
+				PORT2 = 1;
+				PORT3 = 0;
+				PORT4 = 0;
+			}
+			else if(stepCount == 1)
+			{
+				PORT1 = 0;
+				PORT2 = 1;
+				PORT3 = 1;
+				PORT4 = 0;
+			}
+			else if(stepCount == 2)
+			{
+				PORT1 = 0;
+				PORT2 = 0;
+				PORT3 = 1;
+				PORT4 = 1;
+			}
+			else
+			{
+				PORT1 = 1;
+				PORT2 = 0;
+				PORT3 = 0;
+				PORT4 = 1;
+			}
+		}
+		else
+		{
+			if(stepCount == 0)
+			{
+				PORT1 = 1;
+				PORT2 = 0;
+				PORT3 = 0;
+				PORT4 = 1;
+			}
+			else if(stepCount == 1)
+			{
+				PORT1 = 0;
+				PORT2 = 0;
+				PORT3 = 1;
+				PORT4 = 1;
+			}
+			else if(stepCount == 2)
+			{
+				PORT1 = 0;
+				PORT2 = 1;
+				PORT3 = 1;
+				PORT4 = 0;
+			}
+			else
+			{
+				PORT1 = 1;
+				PORT2 = 1;
+				PORT3 = 0;
+				PORT4 = 1;
+			}
+			
+			
+		}
+		
+		stepCount++;
+		totalSteps++;
+		if(stepCount > 3)
+			stepCount = 0;
+	}
+	else
+		interruptCount++;
+
 }
 
 void Timer3_ISR (void) interrupt INTERRUPT_TIMER3
@@ -142,7 +221,7 @@ void Timer3_ISR (void) interrupt INTERRUPT_TIMER3
 	SFRPAGE=0x0;
 	TMR3CN0&=0b_0011_1111; // Clear Timer3 interrupt flags
 	
-	
+	adcFlag = 1;
 }
 
 int getsn (char * buff, int len)
@@ -217,81 +296,6 @@ void ConfigPCA0()
 	
 }
 
-void takeStep(int instr)
-{
-	if(instr) //If the instruction is to move forward...
-	{
-		switch(stepCount)
-		{
-			case 0: //Step 0
-				PORT1 = 1;
-				PORT2 = 1;
-				PORT3 = 0;
-				PORT4 = 0;
-				break;
-			
-			case 1: //Step 1
-				PORT1 = 0;
-				PORT2 = 1;
-				PORT3 = 1;
-				PORT4 = 0;
-				break;
-				
-			case 2: //Step 2
-				PORT1 = 0;
-				PORT2 = 0;
-				PORT3 = 1;
-				PORT4 = 1;
-				break;
-			
-			case 3: //Step 3
-				PORT1 = 1;
-				PORT2 = 0;
-				PORT3 = 0;
-				PORT4 = 1;
-				break;
-		}
-	}
-	else //Go in reverse
-	{
-		switch(stepCount)
-		{
-			case 0: //Step 0
-				PORT1 = 1;
-				PORT2 = 0;
-				PORT3 = 0;
-				PORT4 = 1;
-				break;
-			
-			case 1: //Step 1
-				PORT1 = 0;
-				PORT2 = 0;
-				PORT3 = 1;
-				PORT4 = 1;
-				break;
-				
-			case 2: //Step 2
-				PORT1 = 0;
-				PORT2 = 1;
-				PORT3 = 1;
-				PORT4 = 0;
-				break;
-			
-			case 3: //Step 3
-				PORT1 = 1;
-				PORT2 = 1;
-				PORT3 = 0;
-				PORT4 = 0;
-				break;
-		}
-	}
-	stepCount++;
-	totalSteps++;
-	if(stepCount > 3)
-		stepCount = 0;
-	
-}
-
 void ConfigurePins()
 {
 	P0SKIP |= 0b_1100_1111; //Skip all P0 bits except bits 4 and 5 (UART0)
@@ -318,21 +322,13 @@ void main (void)
 	
 	//Variables used to control the amount of measurements of the ADC to take before writing a voltage reading
 	int measureCount = 0;
-	
-	//Variable used to control motor direction
-	int direction;
-	
-	//Variables used to control the time between steps
-	int stepsInterruptCounter = 0;
-	int stepsTotalInterrupts = 2;
+	int totalMeasurements = 20;
+	float errorConstant = 0.13;
 
 	//Variables used to control the frequency of ADC measurements
 	int readingADCCounter = 0;
-	int readingADCTotalInterrupts = 500;
-	
-	//Variables used by ADC reading
-	int totalMeasurements = 23;
-	float errorConstant = 0.13;
+	int readingADCTotalInterrupts = 50;
+
 	
 	printf("\x1b[2J"); // Clear screen using ANSI escape sequence.
 		
@@ -342,29 +338,14 @@ void main (void)
 
 	InitADC();
 	
-	direction = 1; //Go forward
-	
 	while(1) //Main loop of the program begins here
 	{	
 	
-		
-		//Using timer 2, control how often steps and adc measurements are taken
-		if(stepFlag == 1)
-		{	
-			//Reset the stepFlag set during the ISR
-			stepFlag = 0;
-		
-			//Check if the number of interrupts equals our desired number and take a step if so  
-			if(stepsInterruptCounter < stepsTotalInterrupts)
-				stepsInterruptCounter++;
-			else 
-			{
-				takeStep(direction);
-				
-				//Reset the stepsInterruptCounter variable for next step
-				stepsInterruptCounter = 0;
-			}
+		//Using timer 2, control how often adc measurements are taken
+		if(adcFlag == 1)
+		{		
 			
+			adcFlag = 0;
 			
 			//Check if number of interrupts matches for the desired time
 			if(readingADCCounter < readingADCTotalInterrupts)

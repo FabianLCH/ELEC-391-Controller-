@@ -5,7 +5,7 @@ PCA.c: Configures the PCA for operation in PWM mode and
 outputs a PWM signal through one of the available modules
 
 EFM8LB1 configuration code, ADC setup code and timer setup code provided by
-Professor Jesus Calviño-Fraga from the University of British Columbia.
+Professor Jesus CalviÃ±o-Fraga from the University of British Columbia.
 
 */
 
@@ -141,7 +141,6 @@ void Timer2_ISR (void) interrupt INTERRUPT_TIMER2
 	SFRPAGE=0x0;
 	TF2H = 0; // Clear Timer2 interrupt flag
 	
-	//Do useful stuff below this point
 	stepFlag = 1;
 	
 	
@@ -213,23 +212,23 @@ void ConfigPCA0()
 	PCA0MD = 0b_0000_0000; //Set PCA mode to operate even in idle mode with SYSCLK/12
 	PCA0PWM = 0b_0000_0000;	//Enable 8-bit PWM with no overflow flag set and no interrupts enabled
 	PCA0CLR = 0b_0000_0000; //Disable comparator clear for all modules
-	PCA0CENT = 0b_0000_0000; //Set all modules to edge aligned mode
+	PCA0CENT = 0b_00_000000; //Set all modules to edge aligned mode (bits 6 and 7 are reserved and must be 00)
 	
 	PCA0CN0 = 0b_0100_0000; //Start the PCA counter/timer (CR bit)	
 	
 	//CHANNEL 0 CONFIGURATION
 	PCA0CPM0 = 0b_0100_0010;//Configure Channel 0 to function in 8-bit PWM mode
-	PCA0CPH0 = 0b_0100_0000; //Load the PCA0CP0 high byte with an initial value of 128(binary 1000_0000)
+	PCA0CPH0 = 205; //Load the PCA0CP0 high byte with an initial value of 128(binary 1000_0000)
 	
 	//CHANNEL 1 CONFIGURATION
 	PCA0CPM1 = 0b_0100_0010; //Configure Channel 1 to function in 8-bit PWM mode
-	PCA0CPH1 = 0b_1000_0000; //Load the PCA0CP1 high byte
+	PCA0CPH1 = 128; //Load the PCA0CP1 high byte 
 	
 }
 
-void takeStep(char instr)
+void takeStep(int instr)
 {
-	if(instr == 'F') //If the instruction is to move forward...
+	if(instr) //If the instruction is to move forward...
 	{
 		switch(stepCount)
 		{
@@ -308,7 +307,8 @@ void ConfigurePins()
 	
 	SFRPAGE = 0x20;
 	
-	P1MDIN &= 0b_1000_1111; //Set P1 bits 4,5,6 to analog input for ADC
+	P0MDIN &= 0b_1111_1011; //Set P0 bit 2 to analog input for ADC
+	P1MDIN &= 0b_1110_1111; //Set P1 bit 4 to analog input for ADC
 	
 	SFRPAGE = 0x00;
 	
@@ -320,15 +320,15 @@ void ConfigurePins()
 
 void readADC(int *mCount, float *voltageMeasurements, float *voltageReadings)
 {
-	int totalMeasurements = 500;
+	int totalMeasurements = 300;
+	float errorConstant = 0.13;
 	
 		//Take the average of a given number of total measurements and print it out
 		if((*mCount) < totalMeasurements)
 		{
 			//Add the current reading to the corresponding array position
 			voltageMeasurements[0] += Volts_at_Pin(QFP32_MUX_P1_4);
-			voltageMeasurements[1] += Volts_at_Pin(QFP32_MUX_P1_5);
-			voltageMeasurements[2] += Volts_at_Pin(QFP32_MUX_P1_6);
+			voltageMeasurements[1] += Volts_at_Pin(QFP32_MUX_P0_2);
 			
 			//Increase measureCount variable
 			(*mCount)++;
@@ -336,18 +336,16 @@ void readADC(int *mCount, float *voltageMeasurements, float *voltageReadings)
 		else
 		{
 			//Store the readings in separate variables that are only updated every 10 readings
-			voltageReadings[0] = voltageMeasurements[0]/totalMeasurements;
-			voltageReadings[1] = voltageMeasurements[1]/totalMeasurements;
-			voltageReadings[2] = voltageMeasurements[2]/totalMeasurements;
+			voltageReadings[0] = (voltageMeasurements[0]/totalMeasurements) - errorConstant;
+			voltageReadings[1] = (voltageMeasurements[1]/totalMeasurements) - errorConstant;
 			
 			//Print the results to the terminal
-			printf("V(P1.4)=%4.2fV, V(P1.5)=%4.2fV, V(P1.6)=%5.2fV\r", voltageReadings[0], voltageReadings[1], voltageReadings[2]);
+			printf("V(P1.4)=%4.2fV, V(P0.2)=%4.2fV\r", voltageReadings[0], voltageReadings[1]);
 		
 			//Reset the voltages reading variables 
 			(*mCount) = 0;
 			voltageMeasurements[0] = 0;
 			voltageMeasurements[1] = 0;
-			voltageMeasurements[2] = 0;
 		}		
 	
 }
@@ -356,44 +354,32 @@ void main (void)
 {
 
 	//Float arrays used to store the measurements of the ADC pins
-	float vReadings[3];
-	float voltages[3];
-	
-	//Character variables and arrays to read user input (direction) for testing
-	char dir[4];
-	char direction;
+	float vReadings[2];
+	float voltages[2];
 	
 	//Variables used to control the amount of measurements of the ADC to take before writing a voltage reading
 	int measureCount = 0;
 	
+	//Variable used to control motor direction
+	int direction;
 	
 	//Variables used to control the time between steps
 	int stepsInterruptCounter = 0;
-	int stepsTotalInterrupts = 15;
+	int stepsTotalInterrupts = 20;
+
+	//Variables used to control the frequency of ADC measurements
+	int readingADCCounter = 0;
+	int readingADCTotalInterrupts = 8;
 	
 	printf("\x1b[2J"); // Clear screen using ANSI escape sequence.
 		
 	ConfigurePins();
-	printf("Pin configuration done.\n");
 	
 	ConfigPCA0();
-	printf("PCA configuration done.\n");
 
 	InitADC();
-	printf("ADC configuration done.\n");
 	
-	printf("\n");
-	
-	printf("Enter direction of rotation:\n");
-	getsn(dir,sizeof(dir));
-	
-	sscanf(dir,"%c",&direction);
-	
-	if(direction == 'F')
-		printf("Moving forward.\n");
-	else
-		printf("Moving backwards.\n");
-	
+	direction = 1; //Go forward
 	
 	while(1) //Main loop of the program begins here
 	{	
@@ -402,6 +388,8 @@ void main (void)
 		//Using timer 2, control how often steps and adc measurements are taken
 		if(stepFlag == 1)
 		{	
+			//Reset the stepFlag set during the ISR
+			stepFlag = 0;
 		
 			//Check if the number of interrupts equals our desired number and take a step if so  
 			if(stepsInterruptCounter < stepsTotalInterrupts)
@@ -410,18 +398,26 @@ void main (void)
 			{
 				takeStep(direction);
 				
-				TIMER_OUT_2 = !TIMER_OUT_2; //For testing purposes
+				//TIMER_OUT_2 = !TIMER_OUT_2; //For testing purposes
 				
 				//Reset the stepsInterruptCounter variable for next step
 				stepsInterruptCounter = 0;
 			}
 			
-			//Reset the stepFlag set during the ISR
-			stepFlag = 0;
+			//Check if number of interrupts matches for the desired time
+			if(readingADCCounter < readingADCTotalInterrupts)
+				readingADCCounter++;
+			else
+			{
+				readADC(&measureCount, voltages, vReadings);
+
+				//Reset the ADC interrupts counter
+				readingADCCounter = 0;
+			}
+			
 		}
 		
 		
-		readADC(&measureCount, voltages, vReadings);
 
 	}
 	

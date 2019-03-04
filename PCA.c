@@ -26,7 +26,9 @@ Professor Jesus Calviño-Fraga from the University of British Columbia.
 #define VDD 3.291 
 
 //Timer 2 default frequency (used to control time between steps)
-#define TIMER_2_FREQ 500L
+#define TIMER_2_FREQ 800L //Generate interrupts every 1.25ms
+#define TIMER_3_FREQ 2000L //Generate interrupts every 0.5ms
+
 #define TIMER_OUT_2 P2_5 //Timer 2 output pin (FOR TESTING ONLY, WILL BE REMOVED LATER)
 
 volatile unsigned char stepFlag = 1;
@@ -110,29 +112,17 @@ char _c51_external_startup (void)
 	ET2=1;         // Enable Timer2 interrupts
 	TR2=1;         // Start Timer2 (TMR2CN is bit addressable)
 	
+	// Initialize timer 3 for periodic interrupts
+	TMR3CN0=0x00;   // Stop Timer3; Clear TF3;
+	CKCON0|=0b_0100_0000; // Timer 3 uses the system clock
+	TMR3RL=(0x10000L-(SYSCLK/(2*TIMER_3_FREQ))); // Initialize reload value
+	TMR3=0xffff;   // Set to reload immediately
+	EIE1|=0b_1000_0000;     // Enable Timer3 interrupts
+	TMR3CN0|=0b_0000_0100;  // Start Timer3 (TMR3CN0 is not bit addressable)
+	
 	EA=1; // Enable interrupts
 
 	return 0;
-}
-
-// Uses Timer3 to delay <us> micro-seconds. 
-void Timer3us(unsigned char us)
-{
-	unsigned char i;               // usec counter
-	
-	// The input for Timer 3 is selected as SYSCLK by setting T3ML (bit 6) of CKCON0:
-	CKCON0|=0b_0100_0000;
-	
-	TMR3RL = (-(SYSCLK)/1000000L); // Set Timer3 to overflow in 1us.
-	TMR3 = TMR3RL;                 // Initialize Timer3 for first overflow
-	
-	TMR3CN0 = 0x04;                 // Sart Timer3 and clear overflow flag
-	for (i = 0; i < us; i++)       // Count <us> overflows
-	{
-		while (!(TMR3CN0 & 0x80));  // Wait for overflow
-		TMR3CN0 &= ~(0x80);         // Clear overflow indicator
-	}
-	TMR3CN0 = 0 ;                   // Stop Timer3 and clear overflow flag
 }
 
 //Timer 2 will control the time between steps for the stepper motor
@@ -141,17 +131,18 @@ void Timer2_ISR (void) interrupt INTERRUPT_TIMER2
 	SFRPAGE=0x0;
 	TF2H = 0; // Clear Timer2 interrupt flag
 	
-	stepFlag = 1;
+	TIMER_OUT_2=!TIMER_OUT_2;
 	
+	stepFlag = 1;
 	
 }
 
-void waitms (unsigned int ms)
+void Timer3_ISR (void) interrupt INTERRUPT_TIMER3
 {
-	unsigned int j;
-	unsigned char k;
-	for(j=0; j<ms; j++)
-		for (k=0; k<4; k++) Timer3us(250);
+	SFRPAGE=0x0;
+	TMR3CN0&=0b_0011_1111; // Clear Timer3 interrupt flags
+	
+	
 }
 
 int getsn (char * buff, int len)
@@ -318,38 +309,6 @@ void ConfigurePins()
 	P1MDOUT |= 0b_1000_0000; //Set P1 bit 7 to push-pull output mode	
 }
 
-void readADC(int *mCount, float *voltageMeasurements, float *voltageReadings)
-{
-	int totalMeasurements = 300;
-	float errorConstant = 0.13;
-	
-		//Take the average of a given number of total measurements and print it out
-		if((*mCount) < totalMeasurements)
-		{
-			//Add the current reading to the corresponding array position
-			voltageMeasurements[0] += Volts_at_Pin(QFP32_MUX_P1_4);
-			voltageMeasurements[1] += Volts_at_Pin(QFP32_MUX_P0_2);
-			
-			//Increase measureCount variable
-			(*mCount)++;
-		}
-		else
-		{
-			//Store the readings in separate variables that are only updated every 10 readings
-			voltageReadings[0] = (voltageMeasurements[0]/totalMeasurements) - errorConstant;
-			voltageReadings[1] = (voltageMeasurements[1]/totalMeasurements) - errorConstant;
-			
-			//Print the results to the terminal
-			printf("V(P1.4)=%4.2fV, V(P0.2)=%4.2fV\r", voltageReadings[0], voltageReadings[1]);
-		
-			//Reset the voltages reading variables 
-			(*mCount) = 0;
-			voltageMeasurements[0] = 0;
-			voltageMeasurements[1] = 0;
-		}		
-	
-}
-
 void main (void) 
 {
 
@@ -365,11 +324,15 @@ void main (void)
 	
 	//Variables used to control the time between steps
 	int stepsInterruptCounter = 0;
-	int stepsTotalInterrupts = 20;
+	int stepsTotalInterrupts = 2;
 
 	//Variables used to control the frequency of ADC measurements
 	int readingADCCounter = 0;
-	int readingADCTotalInterrupts = 8;
+	int readingADCTotalInterrupts = 500;
+	
+	//Variables used by ADC reading
+	int totalMeasurements = 23;
+	float errorConstant = 0.13;
 	
 	printf("\x1b[2J"); // Clear screen using ANSI escape sequence.
 		
@@ -398,18 +361,40 @@ void main (void)
 			{
 				takeStep(direction);
 				
-				//TIMER_OUT_2 = !TIMER_OUT_2; //For testing purposes
-				
 				//Reset the stepsInterruptCounter variable for next step
 				stepsInterruptCounter = 0;
 			}
+			
 			
 			//Check if number of interrupts matches for the desired time
 			if(readingADCCounter < readingADCTotalInterrupts)
 				readingADCCounter++;
 			else
 			{
-				readADC(&measureCount, voltages, vReadings);
+				//Take the average of a given number of total measurements and print it out
+				if(measureCount < totalMeasurements)
+				{
+					//Add the current reading to the corresponding array position
+					voltages[0] += Volts_at_Pin(QFP32_MUX_P1_4);
+					voltages[1] += Volts_at_Pin(QFP32_MUX_P0_2);
+					
+					//Increase measureCount variable
+					measureCount++;
+				}
+				else
+				{
+					//Store the readings in separate variables that are only updated every 10 readings
+					vReadings[0] = (voltages[0]/totalMeasurements) - errorConstant;
+					vReadings[1] = (voltages[1]/totalMeasurements) - errorConstant;
+					
+					//Print the results to the terminal
+					printf("V(P1.4)=%4.2fV, V(P0.2)=%4.2fV\r", vReadings[0], vReadings[1]);
+				
+					//Reset the voltages reading variables 
+					measureCount = 0;
+					voltages[0] = 0;
+					voltages[1] = 0;
+				}		
 
 				//Reset the ADC interrupts counter
 				readingADCCounter = 0;

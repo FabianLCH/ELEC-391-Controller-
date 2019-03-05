@@ -15,6 +15,7 @@ Professor Jesus Calvino-Fraga from the University of British Columbia.
 
 #define SYSCLK 72000000L
 #define BAUDRATE 115200L
+#define F_SCK_MAX 2000000L  // Max SCK freq (Hz)
 
 //Ports used to drive the stepper motor
 #define PORT1 P2_1
@@ -88,10 +89,11 @@ char _c51_external_startup (void)
 	#endif
 	
 	P0MDOUT |= 0x10; // Enable UART0 TX as push-pull output
-	XBR0     = 0x01; // Enable UART0 on P0.4(TX) and P0.5(RX)  
+
+	//PCA MODULES ARE ROUTED IN ORDER! (Crossbar in page 116)
+	XBR0     = 0x03; // Enable SPI0 and UART0 on P0.4(TX) and P0.5(RX)  
 	
-	//PCA MODULES ARE ROUTED IN ORDER!
-	XBR1     = 0X02; //Enable PCA I/O and route CEX0 and CEX1 only (check reference manual page 120)
+	XBR1     = 0X01; //Enable PCA I/O and route CEX0 only (check reference manual page 120)
 	
 	XBR2     = 0x40; // Enable crossbar and weak pull-ups
 
@@ -106,6 +108,11 @@ char _c51_external_startup (void)
 	TMOD |=  0x20;                       
 	TR1 = 1; // START Timer1
 	TI = 1;  // Indicate TX0 ready
+
+	// SPI inititialization
+	SPI0CKR = (SYSCLK/(2*F_SCK_MAX))-1;
+	SPI0CFG = 0b_0110_0000; //SPI in master mode (CKPHA = 1, CKPOL = 0)
+	SPI0CN0 = 0b_0000_1001; //SPI enabled and in 4 wire master logic low mode
   	
   	// Initialize timer 2 for periodic interrupts 
 	TMR2CN0=0x00;   // Stop Timer2; Clear TF2;
@@ -288,11 +295,7 @@ void ConfigPCA0()
 	
 	//CHANNEL 0 CONFIGURATION
 	PCA0CPM0 = 0b_0100_0010;//Configure Channel 0 to function in 8-bit PWM mode
-	PCA0CPH0 = 205; //Load the PCA0CP0 high byte with an initial value of 128(binary 1000_0000)
-	
-	//CHANNEL 1 CONFIGURATION
-	PCA0CPM1 = 0b_0100_0010; //Configure Channel 1 to function in 8-bit PWM mode
-	PCA0CPH1 = 128; //Load the PCA0CP1 high byte 
+	PCA0CPH0 = 128; //Load the PCA0CP0 high byte 
 	
 }
 
@@ -303,11 +306,11 @@ void ConfigurePins()
 	SFRPAGE = 0x20;
 	
 	P0MDIN &= 0b_1111_1011; //Set P0 bit 2 to analog input for ADC
-	P1MDIN &= 0b_1110_1111; //Set P1 bit 4 to analog input for ADC
+	P1MDIN &= 0b_1111_0111; //Set P1 bit 3 to analog input for ADC
 	
 	SFRPAGE = 0x00;
 	
-	P1SKIP |= 0b_0111_1111; //Skip all P1 bits except bit 7
+	P1SKIP |= 0b_0000_1111; //Skip P1 bits 0 to 3 (SPI bits will be P1.4 to P1.7)
 	
 	P2MDOUT |= 0b_0111_1111; //Set P2 bits 0, 1, 2, 3, 4, 5 to push-pull output mode
 	P1MDOUT |= 0b_1000_0000; //Set P1 bit 7 to push-pull output mode	
@@ -356,7 +359,7 @@ void main (void)
 				if(measureCount < totalMeasurements)
 				{
 					//Add the current reading to the corresponding array position
-					voltages[0] += Volts_at_Pin(QFP32_MUX_P1_4);
+					voltages[0] += Volts_at_Pin(QFP32_MUX_P1_3);
 					voltages[1] += Volts_at_Pin(QFP32_MUX_P0_2);
 					
 					//Increase measureCount variable
@@ -369,7 +372,7 @@ void main (void)
 					vReadings[1] = (voltages[1]/totalMeasurements) - errorConstant;
 					
 					//Print the results to the terminal
-					printf("V(P1.4)=%4.2fV, V(P0.2)=%4.2fV\r", vReadings[0], vReadings[1]);
+					printf("V(P1.3)=%3.2fV, V(P0.2)=%3.2fV\r", vReadings[0], vReadings[1]);
 				
 					//Reset the voltages reading variables 
 					measureCount = 0;

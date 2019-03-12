@@ -15,76 +15,83 @@ R_GSINIT,code,0000,NO
 R_BSEG,bit,0000,NO
 R_XSEG,xdata,0000,NO
 BIT_BANK,data,0000,OV
-R_CONST,code,0025,NO
+R_CONST,code,0037,NO
 rbank0,data,0000,OV
 R_PSEG,xdata,0000,NO
-R_DINIT,code,0011,NO
-R_DSEG,data,0023,NO
+R_DINIT,code,0017,NO
+R_DSEG,data,002A,NO
 R_OSEG,data,0000,OV
 R_IXSEG,xdata,0000,NO
 R_ISEG,idata,0000,NO
 R_HOME,code,0000,NO
 R_XINIT,code,0000,NO
-R_CSEG,code,047C,NO
+R_CSEG,code,04A7,NO
 </SEGMENTS>
 
 <LOCALS>
 L002004?,R_CSEG,0029,0000
 L002001?,R_CSEG,001E,0000
-_main_sloc0_1_0,R_DSEG,001F,0004
-L003008?,R_CSEG,00B8,0000
-L003005?,R_CSEG,00C7,0000
-L003002?,R_CSEG,00D6,0000
-_getsn_sloc0_1_0,R_DSEG,000B,0002
-L011010?,R_CSEG,02C4,0000
-L005008?,R_CSEG,01BE,0000
-L005005?,R_CSEG,0156,0000
-L005002?,R_CSEG,019F,0000
-L005001?,R_CSEG,0182,0000
-L011023?,R_CSEG,037E,0000
-L011022?,R_CSEG,02EE,0000
-L003052?,R_CSEG,011E,0000
-_main_vReadings_1_73,R_DSEG,000D,0008
-L007004?,R_CSEG,01FD,0000
-L007001?,R_CSEG,01F8,0000
-_main_voltages_1_73,R_DSEG,0015,0008
+_main_sloc0_1_0,R_DSEG,0026,0004
+L003008?,R_CSEG,00BC,0000
+L003005?,R_CSEG,00CB,0000
+L003002?,R_CSEG,00DA,0000
+L005006?,R_CSEG,016D,0000
+L005003?,R_CSEG,014F,0000
+L003052?,R_CSEG,0122,0000
+L012011?,R_CSEG,02AC,0000
+L013019?,R_CSEG,02E4,0000
+L013018?,R_CSEG,02E1,0000
+_main_vReadings_1_80,R_DSEG,0014,0008
+L013010?,R_CSEG,02DA,0000
+L007004?,R_CSEG,0190,0000
+L007001?,R_CSEG,018B,0000
+L013023?,R_CSEG,039A,0000
+L013022?,R_CSEG,030A,0000
+L013021?,R_CSEG,02F7,0000
+_main_voltages_1_80,R_DSEG,001C,0008
 __str_0,R_CONST,0000,0000
 __str_1,R_CONST,0005,0000
-L011005?,R_CSEG,02DE,0000
-L011003?,R_CSEG,0475,0000
-L011002?,R_CSEG,0381,0000
-L003017?,R_CSEG,00EE,0000
-L003014?,R_CSEG,00FD,0000
-L003011?,R_CSEG,010C,0000
-L003027?,R_CSEG,012B,0000
-L003025?,R_CSEG,0129,0000
-L003021?,R_CSEG,0114,0000
-L003020?,R_CSEG,00E0,0000
-L003039?,R_CSEG,00A0,0000
-_getsn_buff_1_59,R_DSEG,0008,0003
-L003038?,R_CSEG,009D,0000
-_main_measureCount_1_73,R_DSEG,001D,0002
-L005018?,R_CSEG,01B8,0000
-L005015?,R_CSEG,017F,0000
+L011001?,R_CSEG,0227,0000
+L012009?,R_CSEG,0251,0000
+L003017?,R_CSEG,00F2,0000
+L012006?,R_CSEG,026C,0000
+L003014?,R_CSEG,0101,0000
+L003011?,R_CSEG,0110,0000
+L003027?,R_CSEG,012F,0000
+L003025?,R_CSEG,012D,0000
+L003021?,R_CSEG,0118,0000
+L003020?,R_CSEG,00E4,0000
+L003039?,R_CSEG,00A6,0000
+L003038?,R_CSEG,00A3,0000
+L013008?,R_CSEG,0499,0000
+L013005?,R_CSEG,02FA,0000
+L013003?,R_CSEG,0495,0000
+L013002?,R_CSEG,039D,0000
+_main_measureCount_1_80,R_DSEG,0024,0002
 </LOCALS>
 
 <PUBLICS>
 _adcFlag,R_DSEG,0000,0001
-_Volts_at_Pin,R_CSEG,0207,0000
-_interruptCount,R_DSEG,0003,0001
-_main,R_CSEG,0297,0000
+_Volts_at_Pin,R_CSEG,019A,0000
+_interruptCount,R_DSEG,0004,0001
+_main,R_CSEG,02AD,0000
+_SPIWrite,R_CSEG,0224,0000
 _direction,R_DSEG,0001,0001
+_delayFlag,R_DSEG,0002,0001
+_spiBytes,R_DSEG,000A,000A
+_windSensorRead,R_CSEG,0230,0000
 __c51_external_startup,R_CSEG,0000,0000
-_stepCount,R_DSEG,0002,0001
-_getsn,R_CSEG,013A,0000
-_ConfigPCA0,R_CSEG,0262,0000
-_Timer3_ISR,R_CSEG,0130,0000
-_Timer2_ISR,R_CSEG,008A,0000
-_ConfigurePins,R_CSEG,027E,0000
-_InitADC,R_CSEG,01DB,0000
-_totalSteps,R_DSEG,0004,0002
-_ADC_at_Pin,R_CSEG,01F3,0000
-_getsn_PARM_2,R_DSEG,0006,0002
+_delay_ms,R_CSEG,0141,0000
+_stepCount,R_DSEG,0003,0001
+_ConfigPCA0,R_CSEG,01F5,0000
+_Timer3_ISR,R_CSEG,0134,0000
+_Timer2_ISR,R_CSEG,0090,0000
+_ConfigurePins,R_CSEG,0211,0000
+_spiByteNum,R_DSEG,0009,0001
+_InitADC,R_CSEG,016E,0000
+_windAngle,R_DSEG,0007,0002
+_totalSteps,R_DSEG,0005,0002
+_ADC_at_Pin,R_CSEG,0186,0000
 </PUBLICS>
 
 <EXTERNALS>
@@ -92,8 +99,6 @@ ___uint2fs,any,0000,0000
 ___fsmul,any,0000,0000
 ___fsadd,any,0000,0000
 _printf,any,0000,0000
-_getchar,any,0000,0000
-__gptrput,any,0000,0000
 ___fssub,any,0000,0000
 _crt0,any,0000,0000
 ___fsdiv,any,0000,0000
@@ -135,11 +140,13 @@ ___fsdiv,any,0000,0000
 <CODE R_DINIT>
 75 data8(_adcFlag;) 01
 75 data8(_direction;) 01
+75 data8(_delayFlag;) 00
 75 data8(_stepCount;) 00
 75 data8(_interruptCount;) 00
 E4
 F5 data8(_totalSteps;)
 F5 data8(_totalSteps;0x0001;+;)
+75 data8(_spiByteNum;) 00
 </CODE>
 
 <CODE R_CSEG>
@@ -163,6 +170,8 @@ E5 A9
 75 E1 03
 75 E2 01
 75 E3 40
+43 D4 CF
+43 D5 0F
 75 98 10
 75 8D E6
 85 8D 8B
@@ -170,9 +179,9 @@ E5 A9
 43 89 20
 D2 8E
 D2 99
-75 A2 11
+75 A2 59
 75 A1 60
-75 F8 09
+75 F8 01
 75 C8 00
 43 8E 10
 75 CA 60
@@ -201,7 +210,6 @@ C2 CF
 B5 data8(_interruptCount;) rel3(L003038?;)
 80 rel2(L003039?;)
 02 addr16(L003025?;)  
-B2 A5
 75 data8(_interruptCount;) 00
 74 01
 B5 data8(_direction;) rel3(L003020?;)
@@ -273,90 +281,33 @@ D0 E0
 75 A7 00
 53 91 3F
 75 data8(_adcFlag;) 01
+75 data8(_delayFlag;) 01
 32
-85 82 data8(_getsn_buff_1_59;)
-85 83 data8(_getsn_buff_1_59;0x0001;+;)
-85 F0 data8(_getsn_buff_1_59;0x0002;+;)
-E4
-F5 data8(_getsn_sloc0_1_0;)
-F5 data8(_getsn_sloc0_1_0;0x0001;+;)
-E5 data8(_getsn_PARM_2;)
-24 FF
-FF
-E5 data8(_getsn_PARM_2;0x0001;+;)
-34 FF
-F8
-79 00
-7A 00
+AA 82
+E5 83
+CA
+25 E0
+CA
+33
+FB
+7C 00
+7D 00
 C3
-E9
-9F
-EA
+EC
+9A
+ED
 64 80
-88 F0
+8B F0
 63 F0 80
 95 F0
-50 rel2(L005008?;)
-C0 02
-C0 07
-C0 00
-C0 01
-12 addr16(_getchar;)  
-AB 82
-D0 01
-D0 00
-D0 07
-D0 02
-BB 0A rel3(L005015?;)
-80 rel2(L005001?;)
-BB 0D rel3(L005002?;)
-E5 data8(_getsn_sloc0_1_0;)
-25 data8(_getsn_buff_1_59;)
-FC
-E5 data8(_getsn_sloc0_1_0;0x0001;+;)
-35 data8(_getsn_buff_1_59;0x0001;+;)
-FD
-AE data8(_getsn_buff_1_59;0x0002;+;)
-8C 82
-8D 83
-8E F0
-E4
-12 addr16(__gptrput;)  
-85 data8(_getsn_sloc0_1_0;) 82
-85 data8(_getsn_sloc0_1_0;0x0001;+;) 83
-22
-E9
-25 data8(_getsn_buff_1_59;)
-FC
-EA
-35 data8(_getsn_buff_1_59;0x0001;+;)
-FD
-AE data8(_getsn_buff_1_59;0x0002;+;)
-8C 82
-8D 83
-8E F0
-EB
-12 addr16(__gptrput;)  
-09
-B9 00 rel3(L005018?;)
-0A
-89 data8(_getsn_sloc0_1_0;)
-8A data8(_getsn_sloc0_1_0;0x0001;+;)
-80 rel2(L005005?;)
-E5 data8(_getsn_sloc0_1_0;)
-25 data8(_getsn_buff_1_59;)
-FA
-E5 data8(_getsn_sloc0_1_0;0x0001;+;)
-35 data8(_getsn_buff_1_59;0x0001;+;)
-FB
-AC data8(_getsn_buff_1_59;0x0002;+;)
-8A 82
-8B 83
-8C F0
-E4
-12 addr16(__gptrput;)  
-85 data8(_getsn_PARM_2;) 82
-85 data8(_getsn_PARM_2;0x0001;+;) 83
+50 rel2(L005006?;)
+74 01
+B5 data8(_delayFlag;) rel3(L005003?;)
+75 data8(_delayFlag;) 00
+0C
+BC 00 rel3(L005003?;)
+0D
+80 rel2(L005003?;)
 22
 75 A7 00
 75 B2 80
@@ -431,18 +382,91 @@ ED
 75 DA 42
 75 FC 80
 22
-43 D4 CF
 75 A7 20
 53 F1 FB
 53 F2 F7
-75 A7 00
-43 D5 0F
+43 A5 D0
 43 A6 7F
-43 A5 80
+75 A7 00
+22
+85 82 A3
+30 FF rel3(L011001?;)
+85 A3 82
+C2 FF
+22
+E5 data8(_spiByteNum;)
+70 rel2(L012009?;)
+C2 A0
+90 00 04
+12 addr16(_delay_ms;)  
+E5 data8(_spiByteNum;)
+24 data8(_spiBytes;)
+F8
+75 82 AA
+C0 00
+12 addr16(_SPIWrite;)  
+E5 82
+D0 00
+F6
+05 data8(_spiByteNum;)
+22
+74 F6
+25 data8(_spiByteNum;)
+40 rel2(L012006?;)
+E5 data8(_spiByteNum;)
+24 data8(_spiBytes;)
+F8
+75 82 FF
+C0 00
+12 addr16(_SPIWrite;)  
+E5 82
+D0 00
+F6
+05 data8(_spiByteNum;)
+22
+D2 A0
+90 00 02
+12 addr16(_delay_ms;)  
+75 data8(_spiByteNum;) 00
+E5 data8(_spiBytes;0x0003;+;)
+FA
+30 E0 rel3(L012011?;)
+AB data8(_spiBytes;0x0002;+;)
+8B 04
+E4
+FB
+FD
+EA
+2B
+FA
+ED
+3C
+FB
+8A 04
+8B 05
+C3
+EC
+94 FF
+ED
+94 FF
+50 rel2(L012011?;)
+8A data8(_windAngle;)
+EB
+A2 E7
+13
+C5 data8(_windAngle;)
+13
+C5 data8(_windAngle;)
+A2 E7
+13
+C5 data8(_windAngle;)
+13
+C5 data8(_windAngle;)
+F5 data8(_windAngle;0x0001;+;)
 22
 E4
-F5 data8(_main_measureCount_1_73;)
-F5 data8(_main_measureCount_1_73;0x0001;+;)
+F5 data8(_main_measureCount_1_80;)
+F5 data8(_main_measureCount_1_80;0x0001;+;)
 FC
 FD
 C0 04
@@ -463,31 +487,33 @@ C0 E0
 D0 05
 D0 04
 74 01
-B5 data8(_adcFlag;) rel3(L011010?;)
+B5 data8(_adcFlag;) rel3(L013018?;)
+80 rel2(L013019?;)
+02 addr16(L013008?;)  
 75 data8(_adcFlag;) 00
 C3
 EC
-94 32
+94 1E
 ED
 64 80
 94 80
-50 rel2(L011005?;)
+50 rel2(L013005?;)
 0C
-BC 00 rel3(L011010?;)
+BC 00 rel3(L013021?;)
 0D
-80 rel2(L011010?;)
+02 addr16(L013008?;)  
 C3
-E5 data8(_main_measureCount_1_73;)
+E5 data8(_main_measureCount_1_80;)
 94 14
-E5 data8(_main_measureCount_1_73;0x0001;+;)
+E5 data8(_main_measureCount_1_80;0x0001;+;)
 64 80
 94 80
-40 rel2(L011022?;)
-02 addr16(L011002?;)  
-85 data8(_main_voltages_1_73;) data8(_main_sloc0_1_0;)
-85 data8(_main_voltages_1_73;0x0001;+;) data8(_main_sloc0_1_0;0x0001;+;)
-85 data8(_main_voltages_1_73;0x0002;+;) data8(_main_sloc0_1_0;0x0002;+;)
-85 data8(_main_voltages_1_73;0x0003;+;) data8(_main_sloc0_1_0;0x0003;+;)
+40 rel2(L013022?;)
+02 addr16(L013002?;)  
+85 data8(_main_voltages_1_80;) data8(_main_sloc0_1_0;)
+85 data8(_main_voltages_1_80;0x0001;+;) data8(_main_sloc0_1_0;0x0001;+;)
+85 data8(_main_voltages_1_80;0x0002;+;) data8(_main_sloc0_1_0;0x0002;+;)
+85 data8(_main_voltages_1_80;0x0003;+;) data8(_main_sloc0_1_0;0x0003;+;)
 75 82 09
 12 addr16(_Volts_at_Pin;)  
 AA 82
@@ -510,14 +536,14 @@ FF
 E5 81
 24 FC
 F5 81
-8A data8(_main_voltages_1_73;)
-8B data8(_main_voltages_1_73;0x0001;+;)
-8E data8(_main_voltages_1_73;0x0002;+;)
-8F data8(_main_voltages_1_73;0x0003;+;)
-85 data8(_main_voltages_1_73;0x0004;+;) data8(_main_sloc0_1_0;)
-85 data8(_main_voltages_1_73;0x0004;+;0x0001;+;) data8(_main_sloc0_1_0;0x0001;+;)
-85 data8(_main_voltages_1_73;0x0004;+;0x0002;+;) data8(_main_sloc0_1_0;0x0002;+;)
-85 data8(_main_voltages_1_73;0x0004;+;0x0003;+;) data8(_main_sloc0_1_0;0x0003;+;)
+8A data8(_main_voltages_1_80;)
+8B data8(_main_voltages_1_80;0x0001;+;)
+8E data8(_main_voltages_1_80;0x0002;+;)
+8F data8(_main_voltages_1_80;0x0003;+;)
+85 data8(_main_voltages_1_80;0x0004;+;) data8(_main_sloc0_1_0;)
+85 data8(_main_voltages_1_80;0x0004;+;0x0001;+;) data8(_main_sloc0_1_0;0x0001;+;)
+85 data8(_main_voltages_1_80;0x0004;+;0x0002;+;) data8(_main_sloc0_1_0;0x0002;+;)
+85 data8(_main_voltages_1_80;0x0004;+;0x0003;+;) data8(_main_sloc0_1_0;0x0003;+;)
 75 82 01
 12 addr16(_Volts_at_Pin;)  
 AA 82
@@ -540,15 +566,15 @@ FF
 E5 81
 24 FC
 F5 81
-8A data8(_main_voltages_1_73;0x0004;+;)
-8B data8(_main_voltages_1_73;0x0004;+;0x0001;+;)
-8E data8(_main_voltages_1_73;0x0004;+;0x0002;+;)
-8F data8(_main_voltages_1_73;0x0004;+;0x0003;+;)
-05 data8(_main_measureCount_1_73;)
+8A data8(_main_voltages_1_80;0x0004;+;)
+8B data8(_main_voltages_1_80;0x0004;+;0x0001;+;)
+8E data8(_main_voltages_1_80;0x0004;+;0x0002;+;)
+8F data8(_main_voltages_1_80;0x0004;+;0x0003;+;)
+05 data8(_main_measureCount_1_80;)
 E4
-B5 data8(_main_measureCount_1_73;) rel3(L011023?;)
-05 data8(_main_measureCount_1_73;0x0001;+;)
-02 addr16(L011003?;)  
+B5 data8(_main_measureCount_1_80;) rel3(L013023?;)
+05 data8(_main_measureCount_1_80;0x0001;+;)
+02 addr16(L013003?;)  
 E4
 C0 E0
 C0 E0
@@ -556,10 +582,10 @@ C0 E0
 C0 E0
 74 41
 C0 E0
-85 data8(_main_voltages_1_73;) 82
-85 data8(_main_voltages_1_73;0x0001;+;) 83
-85 data8(_main_voltages_1_73;0x0002;+;) F0
-E5 data8(_main_voltages_1_73;0x0003;+;)
+85 data8(_main_voltages_1_80;) 82
+85 data8(_main_voltages_1_80;0x0001;+;) 83
+85 data8(_main_voltages_1_80;0x0002;+;) F0
+E5 data8(_main_voltages_1_80;0x0003;+;)
 12 addr16(___fsdiv;)  
 AA 82
 AB 83
@@ -588,10 +614,10 @@ F5 data8(_main_sloc0_1_0;0x0003;+;)
 E5 81
 24 FC
 F5 81
-85 data8(_main_sloc0_1_0;) data8(_main_vReadings_1_73;)
-85 data8(_main_sloc0_1_0;0x0001;+;) data8(_main_vReadings_1_73;0x0001;+;)
-85 data8(_main_sloc0_1_0;0x0002;+;) data8(_main_vReadings_1_73;0x0002;+;)
-85 data8(_main_sloc0_1_0;0x0003;+;) data8(_main_vReadings_1_73;0x0003;+;)
+85 data8(_main_sloc0_1_0;) data8(_main_vReadings_1_80;)
+85 data8(_main_sloc0_1_0;0x0001;+;) data8(_main_vReadings_1_80;0x0001;+;)
+85 data8(_main_sloc0_1_0;0x0002;+;) data8(_main_vReadings_1_80;0x0002;+;)
+85 data8(_main_sloc0_1_0;0x0003;+;) data8(_main_vReadings_1_80;0x0003;+;)
 E4
 C0 E0
 C0 E0
@@ -599,10 +625,10 @@ C0 E0
 C0 E0
 74 41
 C0 E0
-85 data8(_main_voltages_1_73;0x0004;+;) 82
-85 data8(_main_voltages_1_73;0x0004;+;0x0001;+;) 83
-85 data8(_main_voltages_1_73;0x0004;+;0x0002;+;) F0
-E5 data8(_main_voltages_1_73;0x0004;+;0x0003;+;)
+85 data8(_main_voltages_1_80;0x0004;+;) 82
+85 data8(_main_voltages_1_80;0x0004;+;0x0001;+;) 83
+85 data8(_main_voltages_1_80;0x0004;+;0x0002;+;) F0
+E5 data8(_main_voltages_1_80;0x0004;+;0x0003;+;)
 12 addr16(___fsdiv;)  
 AA 82
 AB 83
@@ -631,10 +657,12 @@ FF
 E5 81
 24 FC
 F5 81
-8A data8(_main_vReadings_1_73;0x0004;+;)
-8B data8(_main_vReadings_1_73;0x0004;+;0x0001;+;)
-8E data8(_main_vReadings_1_73;0x0004;+;0x0002;+;)
-8F data8(_main_vReadings_1_73;0x0004;+;0x0003;+;)
+8A data8(_main_vReadings_1_80;0x0004;+;)
+8B data8(_main_vReadings_1_80;0x0004;+;0x0001;+;)
+8E data8(_main_vReadings_1_80;0x0004;+;0x0002;+;)
+8F data8(_main_vReadings_1_80;0x0004;+;0x0003;+;)
+C0 data8(_windAngle;)
+C0 data8(_windAngle;0x0001;+;)
 C0 02
 C0 03
 C0 06
@@ -651,22 +679,27 @@ C0 E0
 C0 E0
 12 addr16(_printf;)  
 E5 81
-24 F5
+24 F3
 F5 81
 E4
-F5 data8(_main_measureCount_1_73;)
-F5 data8(_main_measureCount_1_73;0x0001;+;)
-F5 data8(_main_voltages_1_73;)
-F5 data8(_main_voltages_1_73;0x0001;+;)
-F5 data8(_main_voltages_1_73;0x0002;+;)
-F5 data8(_main_voltages_1_73;0x0003;+;)
-75 data8(_main_voltages_1_73;0x0004;+;) 00
-75 data8(_main_voltages_1_73;0x0004;+;0x0001;+;) 00
-75 data8(_main_voltages_1_73;0x0004;+;0x0002;+;) 00
-75 data8(_main_voltages_1_73;0x0004;+;0x0003;+;) 00
+F5 data8(_main_measureCount_1_80;)
+F5 data8(_main_measureCount_1_80;0x0001;+;)
+F5 data8(_main_voltages_1_80;)
+F5 data8(_main_voltages_1_80;0x0001;+;)
+F5 data8(_main_voltages_1_80;0x0002;+;)
+F5 data8(_main_voltages_1_80;0x0003;+;)
+75 data8(_main_voltages_1_80;0x0004;+;) 00
+75 data8(_main_voltages_1_80;0x0004;+;0x0001;+;) 00
+75 data8(_main_voltages_1_80;0x0004;+;0x0002;+;) 00
+75 data8(_main_voltages_1_80;0x0004;+;0x0003;+;) 00
 7C 00
 7D 00
-02 addr16(L011010?;)  
+C0 04
+C0 05
+12 addr16(_windSensorRead;)  
+D0 05
+D0 04
+02 addr16(L013010?;)  
 </CODE>
 
 <CODE R_CSEG>
@@ -680,7 +713,8 @@ F5 data8(_main_voltages_1_73;0x0003;+;)
 5B 32 4A 
 00
 56 28 50 31 2E 33 29 3D 25 33 2E 32 66 56 2C 20 56
-28 50 30 2E 32 29 3D 25 33 2E 32 66 56 
+28 50 30 2E 32 29 3D 25 33 2E 32 66 56 20 57 69
+6E 64 20 3D 20 25 64 20 64 65 67 72 65 65 73 
 0D
 00
 </CODE>

@@ -15,7 +15,10 @@ Professor Jesus Calvino-Fraga from the University of British Columbia.
 
 #define SYSCLK 72000000L
 #define BAUDRATE 115200L
-#define F_SCK_MAX 2000000L  // Max SCK freq (Hz)
+
+//SCK frequency 
+//For wind sensor, the max value is 434.78kHz
+#define F_SCK_MAX 400000L  
 
 //Ports used to drive the stepper motor
 #define PORT1 P2_1
@@ -30,15 +33,33 @@ Professor Jesus Calvino-Fraga from the University of British Columbia.
 #define TIMER_2_FREQ 1000L //Generate interrupts every 1.25ms
 #define TIMER_3_FREQ 2000L //Generate interrupts every 0.5ms
 
-#define TIMER_OUT_2 P2_5 //Timer 2 output pin (FOR TESTING ONLY, WILL BE REMOVED LATER)
+// SPI0 pins
+// P1.4 - SCK
+// P1.5 - MISO
+// P1.6 - MOSI
 
+//PCA pins 
+// P1.7 - CEX0
+
+#define MASTER_SS P2_0
+
+//ADC reading variables
 volatile unsigned char adcFlag = 1;
 volatile unsigned char direction = 1;
 
+volatile unsigned char delayFlag = 0;
+
+//Stepper motor driving control variables
 volatile unsigned char stepCount = 0;
 volatile unsigned char interruptCount = 0;
 
+//Total number of steps taken 
 int totalSteps = 0;
+
+//Wind sensor reading through SPI variables
+int windAngle;
+unsigned char spiByteNum = 0;
+unsigned char spiBytes[10];
 
 char _c51_external_startup (void)
 {
@@ -97,6 +118,15 @@ char _c51_external_startup (void)
 	
 	XBR2     = 0x40; // Enable crossbar and weak pull-ups
 
+	P0SKIP |= 0b_1100_1111; //Skip all P0 bits except bits 4 and 5 (UART0)
+	
+	/*
+	*  Skip P1 bits 0 to 3 
+	*  - SPI0 bits will be P1.4 to P1.6 and P2.0
+	*  - PCA0 PWM bit will be P1.7 (CEX0)
+	*/
+	P1SKIP |= 0b_0000_1111; 
+	
 	// Configure Uart 0
 	#if (((SYSCLK/BAUDRATE)/(2L*12L))>0xFFL)
 		#error Timer 0 reload value is incorrect because (SYSCLK/BAUDRATE)/(2L*12L) > 0xFF
@@ -112,7 +142,7 @@ char _c51_external_startup (void)
 	// SPI inititialization
 	SPI0CKR = (SYSCLK/(2*F_SCK_MAX))-1;
 	SPI0CFG = 0b_0110_0000; //SPI in master mode (CKPHA = 1, CKPOL = 0)
-	SPI0CN0 = 0b_0000_1001; //SPI enabled and in 4 wire master logic low mode
+	SPI0CN0 = 0b_0000_0001; //SPI enabled and in 3 wire master mode
   	
   	// Initialize timer 2 for periodic interrupts 
 	TMR2CN0=0x00;   // Stop Timer2; Clear TF2;
@@ -146,7 +176,6 @@ void Timer2_ISR (void) interrupt INTERRUPT_TIMER2
 	//--------------------------------
 	if(interruptCount == 3)
 	{
-		TIMER_OUT_2 = !TIMER_OUT_2;
 		interruptCount = 0;
 		if(direction == 1)
 		{
@@ -229,28 +258,21 @@ void Timer3_ISR (void) interrupt INTERRUPT_TIMER3
 	TMR3CN0&=0b_0011_1111; // Clear Timer3 interrupt flags
 	
 	adcFlag = 1;
+	delayFlag = 1;
 }
 
-int getsn (char * buff, int len)
+void delay_ms(int ms)
 {
-	int j;
-	char c;
-	
-	for(j=0; j<(len-1); j++)
+	int countms = 0;
+
+	while(countms < 2 * ms)
 	{
-		c=getchar();
-		if ( (c=='\n') || (c=='\r') )
+		if(delayFlag == 1)
 		{
-			buff[j]=0;
-			return j;
-		}
-		else
-		{
-			buff[j]=c;
+			delayFlag = 0;
+			countms++;
 		}
 	}
-	buff[j]=0;
-	return len;
 }
 
 void InitADC (void)
@@ -300,20 +322,78 @@ void ConfigPCA0()
 }
 
 void ConfigurePins()
-{
-	P0SKIP |= 0b_1100_1111; //Skip all P0 bits except bits 4 and 5 (UART0)
-	
+{	
 	SFRPAGE = 0x20;
 	
 	P0MDIN &= 0b_1111_1011; //Set P0 bit 2 to analog input for ADC
 	P1MDIN &= 0b_1111_0111; //Set P1 bit 3 to analog input for ADC
 	
-	SFRPAGE = 0x00;
+	/* Pin setup:
+	*  P1.4 (SCK) is push-pull
+	*  P1.5 (MISO) is open drain
+	*  P1.6 (MOSI) is push-pull
+	* 
+	*  P1.7 (CEX0) is push-pull
+	*  P2.0 (connected to /SS of sensor) is push-pull
+	* 
+	*  P2.1 to P2.4 (stepper motor pins) are push-pull
+	*/
+	P1MDOUT |= 0b_1101_0000; 
+	P2MDOUT |= 0b_0111_1111; 
 	
-	P1SKIP |= 0b_0000_1111; //Skip P1 bits 0 to 3 (SPI bits will be P1.4 to P1.7)
 	
-	P2MDOUT |= 0b_0111_1111; //Set P2 bits 0, 1, 2, 3, 4, 5 to push-pull output mode
-	P1MDOUT |= 0b_1000_0000; //Set P1 bit 7 to push-pull output mode	
+	SFRPAGE = 0x00;	
+}
+
+unsigned char SPIWrite (unsigned char dat)
+{
+   unsigned char receive;
+   
+   SPI0DAT = dat; //Store the data to transmit in the SPI0 register
+   while(!SPIF); //Wait for the transaction to be finished
+   receive = SPI0DAT;
+   
+   SPIF = 0; //Set the SPI flag back to 0 for next transaction
+   
+   return receive;
+}
+
+void windSensorRead()
+{
+	int temp;
+
+	if(spiByteNum == 0)
+	{
+		MASTER_SS = 0; //Select the wind sensor
+
+		delay_ms(4); //Wait at least 1.5ms before continuing
+		spiBytes[spiByteNum] = SPIWrite(0xAA); //Write the start byte to the sensor and store the incoming byte
+
+		spiByteNum++;
+	}	
+	else
+	{
+		if(spiByteNum < 10)
+		{
+			spiBytes[spiByteNum] = SPIWrite(0xFF); //Keep writing all-Hi to obtain reading from MISO
+			spiByteNum++;
+		}
+		else
+		{
+			MASTER_SS = 1; //Deselect the wind sensor
+			delay_ms(2);
+
+			spiByteNum = 0;
+
+			if(spiBytes[3] & 1)
+			{
+				temp = (spiBytes[2] << 8) + spiBytes[3];
+
+				if(temp < 0xFFFF)	//If the read angle is valid set it to the wind angle
+					windAngle = (temp >> 2);
+			}
+		}
+	}
 }
 
 void main (void) 
@@ -330,7 +410,7 @@ void main (void)
 
 	//Variables used to control the frequency of ADC measurements
 	int readingADCCounter = 0;
-	int readingADCTotalInterrupts = 50;
+	int readingADCTotalInterrupts = 30;
 
 	
 	printf("\x1b[2J"); // Clear screen using ANSI escape sequence.
@@ -372,7 +452,7 @@ void main (void)
 					vReadings[1] = (voltages[1]/totalMeasurements) - errorConstant;
 					
 					//Print the results to the terminal
-					printf("V(P1.3)=%3.2fV, V(P0.2)=%3.2fV\r", vReadings[0], vReadings[1]);
+					printf("V(P1.3)=%3.2fV, V(P0.2)=%3.2fV Wind = %d degrees\r", vReadings[0], vReadings[1], windAngle);
 				
 					//Reset the voltages reading variables 
 					measureCount = 0;
@@ -384,9 +464,11 @@ void main (void)
 				readingADCCounter = 0;
 			}
 			
+			
+			
 		}
 		
-		
+		windSensorRead();
 
 	}
 	

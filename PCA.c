@@ -17,8 +17,10 @@ Professor Jesus Calvino-Fraga from the University of British Columbia.
 #define BAUDRATE 115200L
 
 //SCK frequency 
-//For wind sensor, the max value is 434.78kHz
-#define F_SCK_MAX 400000L  
+//For wind sensor, the max value is 144927 (slow mode)
+//Smallest number we can use to not overflow SPI0CKR is 140625 for 72MHz
+//SPI0CKR is has to have a value between 0 and 255 (8 bit register)
+#define F_SCK_MAX 142000L  
 
 //Ports used to drive the stepper motor
 #define PORT1 P2_1
@@ -30,8 +32,8 @@ Professor Jesus Calvino-Fraga from the University of British Columbia.
 #define VDD 3.291 
 
 //Timer 2 default frequency (used to control time between steps)
-#define TIMER_2_FREQ 1000L //Generate interrupts every 1.25ms
-#define TIMER_3_FREQ 2000L //Generate interrupts every 0.5ms
+#define TIMER_2_FREQ 1000L //Generate interrupts every 1.25us
+#define TIMER_3_FREQ 1000000L //Generate interrupts every 1us
 
 // SPI0 pins
 // P1.4 - SCK
@@ -43,10 +45,13 @@ Professor Jesus Calvino-Fraga from the University of British Columbia.
 
 #define MASTER_SS P2_0
 
+#define TIMER_OUT_2 P2_5
+
 //ADC reading variables
 volatile unsigned char adcFlag = 1;
 volatile unsigned char direction = 1;
 
+//Flag used for delay_us function
 volatile unsigned char delayFlag = 0;
 
 //Stepper motor driving control variables
@@ -57,9 +62,9 @@ volatile unsigned char interruptCount = 0;
 int totalSteps = 0;
 
 //Wind sensor reading through SPI variables
-int windAngle;
-unsigned char spiByteNum = 0;
-unsigned char spiBytes[10];
+float windAngle = 0;
+unsigned int spiByteNum;
+unsigned int spiBytes[10];
 
 char _c51_external_startup (void)
 {
@@ -111,22 +116,21 @@ char _c51_external_startup (void)
 	
 	P0MDOUT |= 0x10; // Enable UART0 TX as push-pull output
 
-	//PCA MODULES ARE ROUTED IN ORDER! (Crossbar in page 116)
-	XBR0     = 0x03; // Enable SPI0 and UART0 on P0.4(TX) and P0.5(RX)  
-	
-	XBR1     = 0X01; //Enable PCA I/O and route CEX0 only (check reference manual page 120)
-	
-	XBR2     = 0x40; // Enable crossbar and weak pull-ups
-
 	P0SKIP |= 0b_1100_1111; //Skip all P0 bits except bits 4 and 5 (UART0)
-	
 	/*
 	*  Skip P1 bits 0 to 3 
 	*  - SPI0 bits will be P1.4 to P1.6 and P2.0
 	*  - PCA0 PWM bit will be P1.7 (CEX0)
 	*/
-	P1SKIP |= 0b_0000_1111; 
+	P1SKIP |= 0b_0000_1111;
+
+	//PCA MODULES ARE ROUTED IN ORDER! (Crossbar in page 116)
+	XBR0     = 0x03; // Enable SPI0 and UART0 on P0.4(TX) and P0.5(RX)  
 	
+	XBR1     = 0x01; //Enable PCA I/O and route CEX0 only (check reference manual page 120)
+	
+	XBR2     = 0x40; // Enable crossbar and weak pull-ups
+
 	// Configure Uart 0
 	#if (((SYSCLK/BAUDRATE)/(2L*12L))>0xFFL)
 		#error Timer 0 reload value is incorrect because (SYSCLK/BAUDRATE)/(2L*12L) > 0xFF
@@ -257,20 +261,23 @@ void Timer3_ISR (void) interrupt INTERRUPT_TIMER3
 	SFRPAGE=0x0;
 	TMR3CN0&=0b_0011_1111; // Clear Timer3 interrupt flags
 	
+	TIMER_OUT_2 = !TIMER_OUT_2;
 	adcFlag = 1;
 	delayFlag = 1;
 }
 
-void delay_ms(int ms)
+void delay_us(int us)
 {
-	int countms = 0;
+	int countus = 0;
 
-	while(countms < 2 * ms)
+	delayFlag = 0;
+
+	while(countus < us)
 	{
 		if(delayFlag == 1)
 		{
 			delayFlag = 0;
-			countms++;
+			countus++;
 		}
 	}
 }
@@ -345,55 +352,73 @@ void ConfigurePins()
 	SFRPAGE = 0x00;	
 }
 
-unsigned char SPIWrite (unsigned char dat)
+void SPIWrite (unsigned char transfer)
 {
-   unsigned char receive;
-   
-   SPI0DAT = dat; //Store the data to transmit in the SPI0 register
+   SPI0DAT = transfer; //Store the data to transmit in the SPI0 register
    while(!SPIF); //Wait for the transaction to be finished
-   receive = SPI0DAT;
-   
    SPIF = 0; //Set the SPI flag back to 0 for next transaction
-   
-   return receive;
 }
 
-void windSensorRead()
+/*  --- wsReadByte ---
+* 	Read one of the incoming bytes from the wind sensor
+*   and store it in a global variable.
+*/
+void wsReadByte() 
 {
-	int temp;
+//Variables used to calculate and display angle read by wind sensor
+unsigned long temp;
 
-	if(spiByteNum == 0)
+	if(spiByteNum < 2)
 	{
-		MASTER_SS = 0; //Select the wind sensor
-
-		delay_ms(4); //Wait at least 1.5ms before continuing
-		spiBytes[spiByteNum] = SPIWrite(0xAA); //Write the start byte to the sensor and store the incoming byte
-
-		spiByteNum++;
+		if(spiByteNum == 0) //First start byte
+		{
+			MASTER_SS = 0; //Select the wind sensor
+			delay_us(7); //Wait at least 6.9us before writing the start byte
+			
+			SPIWrite(0xAA); //Write the start byte to the sensor and store the incoming byte 
+			spiBytes[spiByteNum] = SPI0DAT;
+			spiByteNum++;
+			
+			delay_us(40); //Time to wait between bytes
+		}
+		
+		else //Second start byte
+		{
+			 SPIWrite(0xFF); //Write the start byte to the sensor and store the incoming byte 
+			spiBytes[spiByteNum] = SPI0DAT;
+			spiByteNum++;
+			
+			delay_us(50); //Time to wait between second start byte and byte 0
+		}
 	}	
 	else
 	{
 		if(spiByteNum < 10)
 		{
-			spiBytes[spiByteNum] = SPIWrite(0xFF); //Keep writing all-Hi to obtain reading from MISO
+			SPIWrite(0xFF); //Keep writing all-Hi to obtain reading from MISO
+			spiBytes[spiByteNum] = SPI0DAT;
 			spiByteNum++;
+			
+			delay_us(40); //Time to wait between each byte
 		}
 		else
 		{
 			MASTER_SS = 1; //Deselect the wind sensor
-			delay_ms(2);
+			
+			delay_us(1600); //Wait for at least 1.5ms for data synchronization
 
-			spiByteNum = 0;
+			spiByteNum = 0; //Reset the transfer array number
 
-			if(spiBytes[3] & 1)
+			if((spiBytes[3] & 1) == 1) //If the data is valid (if the LSB is 1, the data is valid)
 			{
-				temp = (spiBytes[2] << 8) + spiBytes[3];
-
-				if(temp < 0xFFFF)	//If the read angle is valid set it to the wind angle
-					windAngle = (temp >> 2);
+				
+				temp = (spiBytes[2] << 8) + spiBytes[3]; //Save the angle in a temporary register
+				
+				windAngle = (temp >> 2); //Shift the angle to the right twice
+				windAngle *= (3600.0/163840.0); //Convert the angle to degrees
 			}
 		}
-	}
+	}	
 }
 
 void main (void) 
@@ -410,20 +435,17 @@ void main (void)
 
 	//Variables used to control the frequency of ADC measurements
 	int readingADCCounter = 0;
-	int readingADCTotalInterrupts = 30;
-
-	
+	int readingADCTotalInterrupts = 15;
+		
 	printf("\x1b[2J"); // Clear screen using ANSI escape sequence.
 		
 	ConfigurePins();
-	
 	ConfigPCA0();
-
 	InitADC();
 	
 	while(1) //Main loop of the program begins here
 	{	
-	
+		
 		//Using timer 2, control how often adc measurements are taken
 		if(adcFlag == 1)
 		{		
@@ -452,7 +474,7 @@ void main (void)
 					vReadings[1] = (voltages[1]/totalMeasurements) - errorConstant;
 					
 					//Print the results to the terminal
-					printf("V(P1.3)=%3.2fV, V(P0.2)=%3.2fV Wind = %d degrees\r", vReadings[0], vReadings[1], windAngle);
+					printf("V(P1.3)=%3.2fV, V(P0.2)=%3.2fV Wind = %.2f degrees\r", vReadings[0], vReadings[1], windAngle);
 				
 					//Reset the voltages reading variables 
 					measureCount = 0;
@@ -468,7 +490,7 @@ void main (void)
 			
 		}
 		
-		windSensorRead();
+	wsReadByte();		
 
 	}
 	

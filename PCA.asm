@@ -1,7 +1,7 @@
 ;--------------------------------------------------------
 ; File Created by C51
 ; Version 1.0.0 #1069 (Apr 23 2015) (MSVC)
-; This file was generated Sat Mar 16 17:58:13 2019
+; This file was generated Tue Mar 19 08:46:43 2019
 ;--------------------------------------------------------
 $name PCA
 $optc51 --model-small
@@ -25,6 +25,7 @@ $printf_float
 ; Public variables in this module
 ;--------------------------------------------------------
 	public _main
+	public _calculateSteps
 	public _wsReadByte
 	public _SPIWrite
 	public _ConfigurePins
@@ -41,8 +42,11 @@ $printf_float
 	public _windAngle
 	public _totalSteps
 	public _interruptCount
-	public _stepCount
+	public _stepNumber
 	public _delayFlag
+	public _stepsCCW
+	public _stepsCW
+	public _moveStepperFlag
 	public _direction
 	public _adcFlag
 ;--------------------------------------------------------
@@ -497,9 +501,15 @@ _adcFlag:
 	ds 1
 _direction:
 	ds 1
+_moveStepperFlag:
+	ds 1
+_stepsCW:
+	ds 1
+_stepsCCW:
+	ds 1
 _delayFlag:
 	ds 1
-_stepCount:
+_stepNumber:
 	ds 1
 _interruptCount:
 	ds 1
@@ -511,11 +521,11 @@ _spiByteNum:
 	ds 2
 _spiBytes:
 	ds 20
-_main_vReadings_1_82:
+_main_vReadings_1_90:
 	ds 8
-_main_voltages_1_82:
+_main_voltages_1_90:
 	ds 8
-_main_measureCount_1_82:
+_main_measureCount_1_90:
 	ds 2
 _main_sloc0_1_0:
 	ds 4
@@ -577,19 +587,25 @@ _main_sloc0_1_0:
 	rseg R_DINIT
 ;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:51: volatile unsigned char adcFlag = 1;
 	mov	_adcFlag,#0x01
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:52: volatile unsigned char direction = 1;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:54: volatile unsigned char direction = 1;
 	mov	_direction,#0x01
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:55: volatile unsigned char delayFlag = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:55: volatile unsigned char moveStepperFlag = 0;
+	mov	_moveStepperFlag,#0x00
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:57: volatile unsigned char stepsCW = 0;
+	mov	_stepsCW,#0x00
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:58: volatile unsigned char stepsCCW = 0;
+	mov	_stepsCCW,#0x00
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:62: volatile unsigned char delayFlag = 0;
 	mov	_delayFlag,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:58: volatile unsigned char stepCount = 0;
-	mov	_stepCount,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:59: volatile unsigned char interruptCount = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:65: volatile unsigned char stepNumber = 0;
+	mov	_stepNumber,#0x00
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:66: volatile unsigned char interruptCount = 0;
 	mov	_interruptCount,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:62: int totalSteps = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:69: int totalSteps = 0;
 	clr	a
 	mov	_totalSteps,a
 	mov	(_totalSteps + 1),a
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:65: float windAngle = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:72: float windAngle = 0;  
 	mov	_windAngle,#0x00
 	mov	(_windAngle + 1),#0x00
 	mov	(_windAngle + 2),#0x00
@@ -603,114 +619,114 @@ _main_sloc0_1_0:
 ;Allocation info for local variables in function '_c51_external_startup'
 ;------------------------------------------------------------
 ;------------------------------------------------------------
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:69: char _c51_external_startup (void)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:78: char _c51_external_startup (void)
 ;	-----------------------------------------
 ;	 function _c51_external_startup
 ;	-----------------------------------------
 __c51_external_startup:
 	using	0
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:72: SFRPAGE = 0x00;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:81: SFRPAGE = 0x00;
 	mov	_SFRPAGE,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:73: WDTCN = 0xDE; //First key
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:82: WDTCN = 0xDE; //First key
 	mov	_WDTCN,#0xDE
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:74: WDTCN = 0xAD; //Second key
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:83: WDTCN = 0xAD; //Second key
 	mov	_WDTCN,#0xAD
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:76: VDM0CN=0x80;       // enable VDD monitor
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:85: VDM0CN=0x80;       // enable VDD monitor
 	mov	_VDM0CN,#0x80
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:77: RSTSRC=0x02|0x04;  // Enable reset on missing clock detector and VDD
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:86: RSTSRC=0x02|0x04;  // Enable reset on missing clock detector and VDD
 	mov	_RSTSRC,#0x06
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:84: SFRPAGE = 0x10;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:93: SFRPAGE = 0x10;
 	mov	_SFRPAGE,#0x10
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:85: PFE0CN  = 0x20; // SYSCLK < 75 MHz.
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:94: PFE0CN  = 0x20; // SYSCLK < 75 MHz.
 	mov	_PFE0CN,#0x20
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:86: SFRPAGE = 0x00;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:95: SFRPAGE = 0x00;
 	mov	_SFRPAGE,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:107: CLKSEL = 0x00;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:116: CLKSEL = 0x00;
 	mov	_CLKSEL,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:108: CLKSEL = 0x00;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:117: CLKSEL = 0x00;
 	mov	_CLKSEL,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:109: while ((CLKSEL & 0x80) == 0);
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:118: while ((CLKSEL & 0x80) == 0);
 L002001?:
 	mov	a,_CLKSEL
 	jnb	acc.7,L002001?
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:110: CLKSEL = 0x03;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:119: CLKSEL = 0x03;
 	mov	_CLKSEL,#0x03
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:111: CLKSEL = 0x03;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:120: CLKSEL = 0x03;
 	mov	_CLKSEL,#0x03
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:112: while ((CLKSEL & 0x80) == 0);
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:121: while ((CLKSEL & 0x80) == 0);
 L002004?:
 	mov	a,_CLKSEL
 	jnb	acc.7,L002004?
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:117: P0MDOUT |= 0x10; // Enable UART0 TX as push-pull output
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:126: P0MDOUT |= 0x10; // Enable UART0 TX as push-pull output
 	orl	_P0MDOUT,#0x10
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:119: P0SKIP |= 0b_1100_1111; //Skip all P0 bits except bits 4 and 5 (UART0)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:128: P0SKIP |= 0b_1100_1111; //Skip all P0 bits except bits 4 and 5 (UART0)
 	orl	_P0SKIP,#0xCF
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:125: P1SKIP |= 0b_0000_1111;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:134: P1SKIP |= 0b_0000_1111;
 	orl	_P1SKIP,#0x0F
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:128: XBR0     = 0x03; // Enable SPI0 and UART0 on P0.4(TX) and P0.5(RX)  
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:137: XBR0     = 0x03; // Enable SPI0 and UART0 on P0.4(TX) and P0.5(RX)  
 	mov	_XBR0,#0x03
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:130: XBR1     = 0x01; //Enable PCA I/O and route CEX0 only (check reference manual page 120)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:139: XBR1     = 0x01; //Enable PCA I/O and route CEX0 only (check reference manual page 120)
 	mov	_XBR1,#0x01
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:132: XBR2     = 0x40; // Enable crossbar and weak pull-ups
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:141: XBR2     = 0x40; // Enable crossbar and weak pull-ups
 	mov	_XBR2,#0x40
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:138: SCON0 = 0x10;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:147: SCON0 = 0x10;
 	mov	_SCON0,#0x10
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:139: TH1 = 0x100-((SYSCLK/BAUDRATE)/(2L*12L));
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:148: TH1 = 0x100-((SYSCLK/BAUDRATE)/(2L*12L));
 	mov	_TH1,#0xE6
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:140: TL1 = TH1;      // Init Timer1
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:149: TL1 = TH1;      // Init Timer1
 	mov	_TL1,_TH1
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:141: TMOD &= ~0xf0;  // TMOD: timer 1 in 8-bit auto-reload
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:150: TMOD &= ~0xf0;  // TMOD: timer 1 in 8-bit auto-reload
 	anl	_TMOD,#0x0F
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:142: TMOD |=  0x20;                       
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:151: TMOD |=  0x20;                       
 	orl	_TMOD,#0x20
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:143: TR1 = 1; // START Timer1
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:152: TR1 = 1; // START Timer1
 	setb	_TR1
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:144: TI = 1;  // Indicate TX0 ready
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:153: TI = 1;  // Indicate TX0 ready
 	setb	_TI
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:147: SPI0CKR = (SYSCLK/(2*F_SCK_MAX))-1;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:156: SPI0CKR = (SYSCLK/(2*F_SCK_MAX))-1;
 	mov	_SPI0CKR,#0xFC
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:148: SPI0CFG = 0b_0110_0000; //SPI in master mode (CKPHA = 1, CKPOL = 0)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:157: SPI0CFG = 0b_0110_0000; //SPI in master mode (CKPHA = 1, CKPOL = 0)
 	mov	_SPI0CFG,#0x60
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:149: SPI0CN0 = 0b_0000_0001; //SPI enabled and in 3 wire master mode
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:158: SPI0CN0 = 0b_0000_0001; //SPI enabled and in 3 wire master mode
 	mov	_SPI0CN0,#0x01
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:152: TMR2CN0=0x00;   // Stop Timer2; Clear TF2;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:161: TMR2CN0=0x00;   // Stop Timer2; Clear TF2;
 	mov	_TMR2CN0,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:153: CKCON0|=0b_0001_0000; // Timer 2 uses the system clock
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:162: CKCON0|=0b_0001_0000; // Timer 2 uses the system clock
 	orl	_CKCON0,#0x10
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:154: TMR2RL=(0x10000L-(SYSCLK/(2*TIMER_2_FREQ))); // Initialize reload value
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:163: TMR2RL=(0x10000L-(SYSCLK/(2*TIMER_2_FREQ))); // Initialize reload value
 	mov	_TMR2RL,#0x60
 	mov	(_TMR2RL >> 8),#0x73
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:155: TMR2=0xffff;   // Set to reload immediately
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:164: TMR2=0xffff;   // Set to reload immediately
 	mov	_TMR2,#0xFF
 	mov	(_TMR2 >> 8),#0xFF
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:156: ET2=1;         // Enable Timer2 interrupts
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:165: ET2=1;         // Enable Timer2 interrupts
 	setb	_ET2
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:157: TR2=1;         // Start Timer2 (TMR2CN is bit addressable)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:166: TR2=1;         // Start Timer2 (TMR2CN is bit addressable)
 	setb	_TR2
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:160: TMR3CN0=0x00;   // Stop Timer3; Clear TF3;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:169: TMR3CN0=0x00;   // Stop Timer3; Clear TF3;
 	mov	_TMR3CN0,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:161: CKCON0|=0b_0100_0000; // Timer 3 uses the system clock
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:170: CKCON0|=0b_0100_0000; // Timer 3 uses the system clock
 	orl	_CKCON0,#0x40
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:162: TMR3RL=(0x10000L-(SYSCLK/(2*TIMER_3_FREQ))); // Initialize reload value
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:171: TMR3RL=(0x10000L-(SYSCLK/(2*TIMER_3_FREQ))); // Initialize reload value
 	mov	_TMR3RL,#0xDC
 	mov	(_TMR3RL >> 8),#0xFF
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:163: TMR3=0xffff;   // Set to reload immediately
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:172: TMR3=0xffff;   // Set to reload immediately
 	mov	_TMR3,#0xFF
 	mov	(_TMR3 >> 8),#0xFF
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:164: EIE1|=0b_1000_0000;     // Enable Timer3 interrupts
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:173: EIE1|=0b_1000_0000;     // Enable Timer3 interrupts
 	orl	_EIE1,#0x80
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:165: TMR3CN0|=0b_0000_0100;  // Start Timer3 (TMR3CN0 is not bit addressable)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:174: TMR3CN0|=0b_0000_0100;  // Start Timer3 (TMR3CN0 is not bit addressable)
 	orl	_TMR3CN0,#0x04
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:167: EA=1; // Enable interrupts
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:176: EA=1; // Enable interrupts
 	setb	_EA
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:169: return 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:178: return 0;
 	mov	dpl,#0x00
 	ret
 ;------------------------------------------------------------
 ;Allocation info for local variables in function 'Timer2_ISR'
 ;------------------------------------------------------------
 ;------------------------------------------------------------
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:173: void Timer2_ISR (void) interrupt INTERRUPT_TIMER2
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:183: void Timer2_ISR (void) interrupt INTERRUPT_TIMER2
 ;	-----------------------------------------
 ;	 function Timer2_ISR
 ;	-----------------------------------------
@@ -718,138 +734,153 @@ _Timer2_ISR:
 	push	acc
 	push	psw
 	mov	psw,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:175: SFRPAGE=0x0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:185: SFRPAGE=0x0;
 	mov	_SFRPAGE,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:176: TF2H = 0; // Clear Timer2 interrupt flag
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:186: TF2H = 0; // Clear Timer2 interrupt flag
 	clr	_TF2H
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:181: if(interruptCount == 3)
-	mov	a,#0x03
-	cjne	a,_interruptCount,L003038?
-	sjmp	L003039?
-L003038?:
-	ljmp	L003025?
-L003039?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:183: interruptCount = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:191: if(moveStepperFlag == 1)
+	mov	a,#0x01
+	cjne	a,_moveStepperFlag,L003047?
+	sjmp	L003048?
+L003047?:
+	ljmp	L003033?
+L003048?:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:193: if(interruptCount == 4)
+	mov	a,#0x04
+	cjne	a,_interruptCount,L003049?
+	sjmp	L003050?
+L003049?:
+	ljmp	L003029?
+L003050?:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:195: interruptCount = 0;
 	mov	_interruptCount,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:184: if(direction == 1)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:196: if(direction == 1)
 	mov	a,#0x01
-	cjne	a,_direction,L003020?
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:186: if(stepCount == 0)
-	mov	a,_stepCount
+	cjne	a,_direction,L003024?
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:198: if(stepsCW != 0)
+	mov	a,_stepsCW
+	jnz	L003053?
+	ljmp	L003025?
+L003053?:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:200: if(stepNumber == 0)
+	mov	a,_stepNumber
 	jnz	L003008?
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:188: PORT1 = 1;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:202: PORT1 = 1;
 	setb	_P2_1
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:189: PORT2 = 1;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:203: PORT2 = 1;
 	setb	_P2_2
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:190: PORT3 = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:204: PORT3 = 0;
 	clr	_P2_3
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:191: PORT4 = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:205: PORT4 = 0;
 	clr	_P2_4
-	sjmp	L003021?
+	sjmp	L003025?
 L003008?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:193: else if(stepCount == 1)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:207: else if(stepNumber == 1)
 	mov	a,#0x01
-	cjne	a,_stepCount,L003005?
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:195: PORT1 = 0;
+	cjne	a,_stepNumber,L003005?
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:209: PORT1 = 0;
 	clr	_P2_1
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:196: PORT2 = 1;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:210: PORT2 = 1;
 	setb	_P2_2
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:197: PORT3 = 1;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:211: PORT3 = 1;
 	setb	_P2_3
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:198: PORT4 = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:212: PORT4 = 0;
 	clr	_P2_4
-	sjmp	L003021?
+	sjmp	L003025?
 L003005?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:200: else if(stepCount == 2)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:214: else if(stepNumber == 2)
 	mov	a,#0x02
-	cjne	a,_stepCount,L003002?
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:202: PORT1 = 0;
+	cjne	a,_stepNumber,L003002?
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:216: PORT1 = 0;
 	clr	_P2_1
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:203: PORT2 = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:217: PORT2 = 0;
 	clr	_P2_2
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:204: PORT3 = 1;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:218: PORT3 = 1;
 	setb	_P2_3
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:205: PORT4 = 1;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:219: PORT4 = 1;
 	setb	_P2_4
-	sjmp	L003021?
+	sjmp	L003025?
 L003002?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:209: PORT1 = 1;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:223: PORT1 = 1;
 	setb	_P2_1
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:210: PORT2 = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:224: PORT2 = 0;
 	clr	_P2_2
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:211: PORT3 = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:225: PORT3 = 0;
 	clr	_P2_3
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:212: PORT4 = 1;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:226: PORT4 = 1;
 	setb	_P2_4
-	sjmp	L003021?
-L003020?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:217: if(stepCount == 0)
-	mov	a,_stepCount
-	jnz	L003017?
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:219: PORT1 = 1;
+	sjmp	L003025?
+L003024?:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:232: if(stepsCCW != 0)
+	mov	a,_stepsCCW
+	jz	L003025?
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:234: if(stepNumber == 0)
+	mov	a,_stepNumber
+	jnz	L003019?
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:236: PORT1 = 1;
 	setb	_P2_1
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:220: PORT2 = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:237: PORT2 = 0;
 	clr	_P2_2
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:221: PORT3 = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:238: PORT3 = 0;
 	clr	_P2_3
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:222: PORT4 = 1;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:239: PORT4 = 1;
 	setb	_P2_4
-	sjmp	L003021?
-L003017?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:224: else if(stepCount == 1)
+	sjmp	L003025?
+L003019?:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:241: else if(stepNumber == 1)
 	mov	a,#0x01
-	cjne	a,_stepCount,L003014?
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:226: PORT1 = 0;
+	cjne	a,_stepNumber,L003016?
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:243: PORT1 = 0;
 	clr	_P2_1
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:227: PORT2 = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:244: PORT2 = 0;
 	clr	_P2_2
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:228: PORT3 = 1;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:245: PORT3 = 1;
 	setb	_P2_3
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:229: PORT4 = 1;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:246: PORT4 = 1;
 	setb	_P2_4
-	sjmp	L003021?
-L003014?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:231: else if(stepCount == 2)
+	sjmp	L003025?
+L003016?:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:248: else if(stepNumber == 2)
 	mov	a,#0x02
-	cjne	a,_stepCount,L003011?
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:233: PORT1 = 0;
+	cjne	a,_stepNumber,L003013?
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:250: PORT1 = 0;
 	clr	_P2_1
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:234: PORT2 = 1;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:251: PORT2 = 1;
 	setb	_P2_2
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:235: PORT3 = 1;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:252: PORT3 = 1;
 	setb	_P2_3
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:236: PORT4 = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:253: PORT4 = 0;
 	clr	_P2_4
-	sjmp	L003021?
-L003011?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:240: PORT1 = 1;
+	sjmp	L003025?
+L003013?:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:257: PORT1 = 1;
 	setb	_P2_1
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:241: PORT2 = 1;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:258: PORT2 = 1;
 	setb	_P2_2
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:242: PORT3 = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:259: PORT3 = 0;
 	clr	_P2_3
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:243: PORT4 = 1;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:260: PORT4 = 1;
 	setb	_P2_4
-L003021?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:249: stepCount++;
-	inc	_stepCount
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:250: totalSteps++;
+L003025?:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:266: stepNumber++;
+	inc	_stepNumber
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:267: totalSteps++;
 	inc	_totalSteps
 	clr	a
-	cjne	a,_totalSteps,L003052?
+	cjne	a,_totalSteps,L003065?
 	inc	(_totalSteps + 1)
-L003052?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:251: if(stepCount > 3)
-	mov	a,_stepCount
+L003065?:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:268: if(stepNumber > 3)
+	mov	a,_stepNumber
 	add	a,#0xff - 0x03
-	jnc	L003027?
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:252: stepCount = 0;
-	mov	_stepCount,#0x00
-	sjmp	L003027?
-L003025?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:255: interruptCount++;
+	jnc	L003033?
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:269: stepNumber = 0;
+	mov	_stepNumber,#0x00
+	sjmp	L003033?
+L003029?:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:272: interruptCount++;
 	inc	_interruptCount
-L003027?:
+L003033?:
 	pop	psw
 	pop	acc
 	reti
@@ -860,20 +891,18 @@ L003027?:
 ;Allocation info for local variables in function 'Timer3_ISR'
 ;------------------------------------------------------------
 ;------------------------------------------------------------
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:259: void Timer3_ISR (void) interrupt INTERRUPT_TIMER3
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:278: void Timer3_ISR (void) interrupt INTERRUPT_TIMER3
 ;	-----------------------------------------
 ;	 function Timer3_ISR
 ;	-----------------------------------------
 _Timer3_ISR:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:261: SFRPAGE=0x0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:280: SFRPAGE=0x0;
 	mov	_SFRPAGE,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:262: TMR3CN0&=0b_0011_1111; // Clear Timer3 interrupt flags
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:281: TMR3CN0&=0b_0011_1111; // Clear Timer3 interrupt flags
 	anl	_TMR3CN0,#0x3F
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:264: TIMER_OUT_2 = !TIMER_OUT_2;
-	cpl	_P2_5
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:265: adcFlag = 1;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:283: adcFlag = 1;
 	mov	_adcFlag,#0x01
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:266: delayFlag = 1;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:284: delayFlag = 1;
 	mov	_delayFlag,#0x01
 	reti
 ;	eliminated unneeded push/pop psw
@@ -887,16 +916,16 @@ _Timer3_ISR:
 ;us                        Allocated to registers r2 r3 
 ;countus                   Allocated to registers r4 r5 
 ;------------------------------------------------------------
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:269: void delay_us(int us)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:291: void delay_us(int us)
 ;	-----------------------------------------
 ;	 function delay_us
 ;	-----------------------------------------
 _delay_us:
 	mov	r2,dpl
 	mov	r3,dph
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:273: delayFlag = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:295: delayFlag = 0;
 	mov	_delayFlag,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:275: while(countus < us)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:297: while(countus < us)
 	mov	r4,#0x00
 	mov	r5,#0x00
 L005003?:
@@ -909,12 +938,12 @@ L005003?:
 	xrl	b,#0x80
 	subb	a,b
 	jnc	L005006?
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:277: if(delayFlag == 1)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:299: if(delayFlag == 1)
 	mov	a,#0x01
 	cjne	a,_delayFlag,L005003?
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:279: delayFlag = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:301: delayFlag = 0;
 	mov	_delayFlag,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:280: countus++;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:302: countus++;
 	inc	r4
 	cjne	r4,#0x00,L005003?
 	inc	r5
@@ -925,26 +954,26 @@ L005006?:
 ;Allocation info for local variables in function 'InitADC'
 ;------------------------------------------------------------
 ;------------------------------------------------------------
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:285: void InitADC (void)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:311: void InitADC (void)
 ;	-----------------------------------------
 ;	 function InitADC
 ;	-----------------------------------------
 _InitADC:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:287: SFRPAGE = 0x00;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:313: SFRPAGE = 0x00;
 	mov	_SFRPAGE,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:288: ADC0CN1 = 0b_10_000_000; //14-bit,  Right justified no shifting applied, perform and Accumulate 1 conversion.
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:314: ADC0CN1 = 0b_10_000_000; //14-bit,  Right justified no shifting applied, perform and Accumulate 1 conversion.
 	mov	_ADC0CN1,#0x80
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:289: ADC0CF0 = 0b_11111_0_00; // SYSCLK/32
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:315: ADC0CF0 = 0b_11111_0_00; // SYSCLK/32
 	mov	_ADC0CF0,#0xF8
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:290: ADC0CF1 = 0b_0_0_011110; // Same as default for now
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:316: ADC0CF1 = 0b_0_0_011110; // Same as default for now
 	mov	_ADC0CF1,#0x1E
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:291: ADC0CN0 = 0b_0_0_0_0_0_00_0; // Same as default for now
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:317: ADC0CN0 = 0b_0_0_0_0_0_00_0; // Same as default for now
 	mov	_ADC0CN0,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:292: ADC0CF2 = 0b_0_01_11111 ; // GND pin, Vref=VDD
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:318: ADC0CF2 = 0b_0_01_11111 ; // GND pin, Vref=VDD
 	mov	_ADC0CF2,#0x3F
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:293: ADC0CN2 = 0b_0_000_0000;  // Same as default for now. ADC0 conversion initiated on write of 1 to ADBUSY.
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:319: ADC0CN2 = 0b_0_000_0000;  // Same as default for now. ADC0 conversion initiated on write of 1 to ADBUSY.
 	mov	_ADC0CN2,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:294: ADEN=1; // Enable ADC
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:320: ADEN=1; // Enable ADC
 	setb	_ADEN
 	ret
 ;------------------------------------------------------------
@@ -952,23 +981,23 @@ _InitADC:
 ;------------------------------------------------------------
 ;pin                       Allocated to registers 
 ;------------------------------------------------------------
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:297: unsigned int ADC_at_Pin(unsigned char pin)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:326: unsigned int ADC_at_Pin(unsigned char pin)
 ;	-----------------------------------------
 ;	 function ADC_at_Pin
 ;	-----------------------------------------
 _ADC_at_Pin:
 	mov	_ADC0MX,dpl
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:300: ADBUSY=1;       // Dummy conversion first to select new pin
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:329: ADBUSY=1;       // Dummy conversion first to select new pin
 	setb	_ADBUSY
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:301: while (ADBUSY); // Wait for dummy conversion to finish
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:330: while (ADBUSY); // Wait for dummy conversion to finish
 L007001?:
 	jb	_ADBUSY,L007001?
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:302: ADBUSY = 1;     // Convert voltage at the pin
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:331: ADBUSY = 1;     // Convert voltage at the pin
 	setb	_ADBUSY
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:303: while (ADBUSY); // Wait for conversion to complete
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:332: while (ADBUSY); // Wait for conversion to complete
 L007004?:
 	jb	_ADBUSY,L007004?
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:304: return (ADC0);
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:333: return (ADC0);
 	mov	dpl,_ADC0
 	mov	dph,(_ADC0 >> 8)
 	ret
@@ -977,12 +1006,12 @@ L007004?:
 ;------------------------------------------------------------
 ;pin                       Allocated to registers r2 
 ;------------------------------------------------------------
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:307: float Volts_at_Pin(unsigned char pin)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:340: float Volts_at_Pin(unsigned char pin)
 ;	-----------------------------------------
 ;	 function Volts_at_Pin
 ;	-----------------------------------------
 _Volts_at_Pin:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:309: return ((ADC_at_Pin(pin)*VDD)/16383.0);
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:342: return ((ADC_at_Pin(pin)*VDD)/16383.0);
 	lcall	_ADC_at_Pin
 	lcall	___uint2fs
 	mov	r2,dpl
@@ -1033,50 +1062,50 @@ _Volts_at_Pin:
 ;Allocation info for local variables in function 'ConfigPCA0'
 ;------------------------------------------------------------
 ;------------------------------------------------------------
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:312: void ConfigPCA0()
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:349: void ConfigPCA0()
 ;	-----------------------------------------
 ;	 function ConfigPCA0
 ;	-----------------------------------------
 _ConfigPCA0:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:314: SFRPAGE = 0x00; //Navigate to SFR page for register write
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:351: SFRPAGE = 0x00; //Navigate to SFR page for register write
 	mov	_SFRPAGE,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:316: PCA0POL = 0b_0000_0000; //Set the output polarity for all channels to default (no inversion)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:353: PCA0POL = 0b_0000_0000; //Set the output polarity for all channels to default (no inversion)
 	mov	_PCA0POL,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:318: PCA0MD = 0b_0000_0000; //Set PCA mode to operate even in idle mode with SYSCLK/12
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:355: PCA0MD = 0b_0000_0000; //Set PCA mode to operate even in idle mode with SYSCLK/12
 	mov	_PCA0MD,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:319: PCA0PWM = 0b_0000_0000;	//Enable 8-bit PWM with no overflow flag set and no interrupts enabled
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:356: PCA0PWM = 0b_0000_0000;	//Enable 8-bit PWM with no overflow flag set and no interrupts enabled
 	mov	_PCA0PWM,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:320: PCA0CLR = 0b_0000_0000; //Disable comparator clear for all modules
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:357: PCA0CLR = 0b_0000_0000; //Disable comparator clear for all modules
 	mov	_PCA0CLR,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:321: PCA0CENT = 0b_00_000000; //Set all modules to edge aligned mode (bits 6 and 7 are reserved and must be 00)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:358: PCA0CENT = 0b_00_000000; //Set all modules to edge aligned mode (bits 6 and 7 are reserved and must be 00)
 	mov	_PCA0CENT,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:323: PCA0CN0 = 0b_0100_0000; //Start the PCA counter/timer (CR bit)	
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:360: PCA0CN0 = 0b_0100_0000; //Start the PCA counter/timer (CR bit)	
 	mov	_PCA0CN0,#0x40
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:326: PCA0CPM0 = 0b_0100_0010;//Configure Channel 0 to function in 8-bit PWM mode
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:363: PCA0CPM0 = 0b_0100_0010;//Configure Channel 0 to function in 8-bit PWM mode
 	mov	_PCA0CPM0,#0x42
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:327: PCA0CPH0 = 128; //Load the PCA0CP0 high byte 
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:364: PCA0CPH0 = 128; //Load the PCA0CP0 high byte 
 	mov	_PCA0CPH0,#0x80
 	ret
 ;------------------------------------------------------------
 ;Allocation info for local variables in function 'ConfigurePins'
 ;------------------------------------------------------------
 ;------------------------------------------------------------
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:331: void ConfigurePins()
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:371: void ConfigurePins()
 ;	-----------------------------------------
 ;	 function ConfigurePins
 ;	-----------------------------------------
 _ConfigurePins:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:333: SFRPAGE = 0x20;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:373: SFRPAGE = 0x20;
 	mov	_SFRPAGE,#0x20
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:335: P0MDIN &= 0b_1111_1011; //Set P0 bit 2 to analog input for ADC
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:375: P0MDIN &= 0b_1111_1011; //Set P0 bit 2 to analog input for ADC
 	anl	_P0MDIN,#0xFB
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:336: P1MDIN &= 0b_1111_0111; //Set P1 bit 3 to analog input for ADC
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:376: P1MDIN &= 0b_1111_0111; //Set P1 bit 3 to analog input for ADC
 	anl	_P1MDIN,#0xF7
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:348: P1MDOUT |= 0b_1101_0000; 
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:388: P1MDOUT |= 0b_1101_0000; 
 	orl	_P1MDOUT,#0xD0
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:349: P2MDOUT |= 0b_0111_1111; 
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:389: P2MDOUT |= 0b_0111_1111; 
 	orl	_P2MDOUT,#0x7F
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:352: SFRPAGE = 0x00;	
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:392: SFRPAGE = 0x00;	
 	mov	_SFRPAGE,#0x00
 	ret
 ;------------------------------------------------------------
@@ -1084,15 +1113,15 @@ _ConfigurePins:
 ;------------------------------------------------------------
 ;transfer                  Allocated to registers 
 ;------------------------------------------------------------
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:355: void SPIWrite (unsigned char transfer)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:399: void SPIWrite (unsigned char transfer)
 ;	-----------------------------------------
 ;	 function SPIWrite
 ;	-----------------------------------------
 _SPIWrite:
 	mov	_SPI0DAT,dpl
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:358: while(!SPIF); //Wait for the transaction to be finished
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:402: while(!SPIF); //Wait for the transaction to be finished
 L011001?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:359: SPIF = 0; //Set the SPI flag back to 0 for next transaction
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:403: SPIF = 0; //Set the SPI flag back to 0 for next transaction
 	jbc	_SPIF,L011008?
 	sjmp	L011001?
 L011008?:
@@ -1100,33 +1129,33 @@ L011008?:
 ;------------------------------------------------------------
 ;Allocation info for local variables in function 'wsReadByte'
 ;------------------------------------------------------------
-;temp                      Allocated to registers r2 r3 r4 r5 
+;tempNormal                Allocated to registers r2 r3 r4 r5 
 ;------------------------------------------------------------
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:366: void wsReadByte() 
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:410: void wsReadByte() 
 ;	-----------------------------------------
 ;	 function wsReadByte
 ;	-----------------------------------------
 _wsReadByte:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:371: if(spiByteNum < 2)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:415: if(spiByteNum < 2)
 	clr	c
 	mov	a,_spiByteNum
 	subb	a,#0x02
 	mov	a,(_spiByteNum + 1)
 	subb	a,#0x00
 	jnc	L012010?
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:373: if(spiByteNum == 0) //First start byte
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:417: if(spiByteNum == 0) //First start byte
 	mov	a,_spiByteNum
 	orl	a,(_spiByteNum + 1)
 	jnz	L012002?
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:375: MASTER_SS = 0; //Select the wind sensor
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:419: MASTER_SS = 0; //Select the wind sensor
 	clr	_P2_0
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:376: delay_us(7); //Wait at least 6.9us before writing the start byte
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:420: delay_us(7); //Wait at least 6.9us before writing the start byte
 	mov	dptr,#0x0007
 	lcall	_delay_us
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:378: SPIWrite(0xAA); //Write the start byte to the sensor and store the incoming byte 
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:422: SPIWrite(0xAA); //Write the start byte to the sensor and store the incoming byte 
 	mov	dpl,#0xAA
 	lcall	_SPIWrite
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:379: spiBytes[spiByteNum] = SPI0DAT;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:423: spiBytes[spiByteNum] = SPI0DAT;
 	mov	a,_spiByteNum
 	add	a,_spiByteNum
 	mov	r2,a
@@ -1140,20 +1169,20 @@ _wsReadByte:
 	mov	@r0,ar2
 	inc	r0
 	mov	@r0,ar3
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:380: spiByteNum++;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:424: spiByteNum++;
 	inc	_spiByteNum
 	clr	a
 	cjne	a,_spiByteNum,L012020?
 	inc	(_spiByteNum + 1)
 L012020?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:382: delay_us(40); //Time to wait between bytes
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:426: delay_us(40); //Time to wait between bytes
 	mov	dptr,#0x0028
 	ljmp	_delay_us
 L012002?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:387: SPIWrite(0xFF); //Write the start byte to the sensor and store the incoming byte 
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:431: SPIWrite(0xFF); //Write the start byte to the sensor and store the incoming byte 
 	mov	dpl,#0xFF
 	lcall	_SPIWrite
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:388: spiBytes[spiByteNum] = SPI0DAT;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:432: spiBytes[spiByteNum] = SPI0DAT;
 	mov	a,_spiByteNum
 	add	a,_spiByteNum
 	mov	r2,a
@@ -1167,27 +1196,27 @@ L012002?:
 	mov	@r0,ar2
 	inc	r0
 	mov	@r0,ar3
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:389: spiByteNum++;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:433: spiByteNum++;
 	inc	_spiByteNum
 	clr	a
 	cjne	a,_spiByteNum,L012021?
 	inc	(_spiByteNum + 1)
 L012021?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:391: delay_us(50); //Time to wait between second start byte and byte 0
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:435: delay_us(50); //Time to wait between second start byte and byte 0
 	mov	dptr,#0x0032
 	ljmp	_delay_us
 L012010?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:396: if(spiByteNum < 10)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:440: if(spiByteNum < 10)
 	clr	c
 	mov	a,_spiByteNum
 	subb	a,#0x0A
 	mov	a,(_spiByteNum + 1)
 	subb	a,#0x00
 	jnc	L012007?
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:398: SPIWrite(0xFF); //Keep writing all-Hi to obtain reading from MISO
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:442: SPIWrite(0xFF); //Keep writing all-Hi to obtain reading from MISO
 	mov	dpl,#0xFF
 	lcall	_SPIWrite
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:399: spiBytes[spiByteNum] = SPI0DAT;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:443: spiBytes[spiByteNum] = SPI0DAT;
 	mov	a,_spiByteNum
 	add	a,_spiByteNum
 	mov	r2,a
@@ -1201,46 +1230,46 @@ L012010?:
 	mov	@r0,ar2
 	inc	r0
 	mov	@r0,ar3
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:400: spiByteNum++;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:444: spiByteNum++;
 	inc	_spiByteNum
 	clr	a
 	cjne	a,_spiByteNum,L012023?
 	inc	(_spiByteNum + 1)
 L012023?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:402: delay_us(40); //Time to wait between each byte
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:446: delay_us(40); //Time to wait between each byte
 	mov	dptr,#0x0028
 	ljmp	_delay_us
 L012007?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:406: MASTER_SS = 1; //Deselect the wind sensor
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:450: MASTER_SS = 1; //Deselect the wind sensor
 	setb	_P2_0
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:408: delay_us(1600); //Wait for at least 1.5ms for data synchronization
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:452: delay_us(1600); //Wait for at least 1.5ms for data synchronization
 	mov	dptr,#0x0640
 	lcall	_delay_us
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:410: spiByteNum = 0; //Reset the transfer array number
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:454: spiByteNum = 0; //Reset the transfer array number
 	clr	a
 	mov	_spiByteNum,a
 	mov	(_spiByteNum + 1),a
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:412: if((spiBytes[3] & 1) == 1) //If the data is valid (if the LSB is 1, the data is valid)
-	mov	r2,(_spiBytes + 0x0006)
-	mov	r3,((_spiBytes + 0x0006) + 1)
-	mov	a,#0x01
-	anl	a,r2
-	mov	r4,a
-	mov	r5,#0x00
-	cjne	r4,#0x01,L012012?
-	cjne	r5,#0x00,L012012?
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:415: temp = (spiBytes[2] << 8) + spiBytes[3]; //Save the angle in a temporary register
-	mov	r5,(_spiBytes + 0x0004)
-	mov	r4,#0x00
-	mov	a,r2
-	add	a,r4
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:456: tempNormal = (spiBytes[2] << 8) + spiBytes[3]; //Save the angle data 
+	mov	r3,(_spiBytes + 0x0004)
+	mov	r2,#0x00
+	mov	a,(_spiBytes + 0x0006)
+	add	a,r2
 	mov	r2,a
-	mov	a,r3
-	addc	a,r5
+	mov	a,((_spiBytes + 0x0006) + 1)
+	addc	a,r3
 	mov	r3,a
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:417: windAngle = (temp >> 2); //Shift the angle to the right twice
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:458: if((spiBytes[3] & 1) == 1) //If the data read is accurate (if the LSB is 1, the data is valid)
 	clr	a
 	mov	r4,a
+	mov	r5,a
+	mov	a,#0x01
+	anl	a,(_spiBytes + 0x0006)
+	mov	r6,a
+	mov	r7,#0x00
+	cjne	r6,#0x01,L012012?
+	cjne	r7,#0x00,L012012?
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:460: windAngle = (tempNormal >> 2); //Shift the angle to the right twice
+	mov	a,r5
 	clr	c
 	rrc	a
 	mov	r5,a
@@ -1274,7 +1303,7 @@ L012007?:
 	mov	(_windAngle + 1),dph
 	mov	(_windAngle + 2),b
 	mov	(_windAngle + 3),a
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:418: windAngle *= (3600.0/163840.0); //Convert the angle to degrees
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:461: windAngle *= (3600.0/163840.0); //Convert the angle to degrees
 	push	_windAngle
 	push	(_windAngle + 1)
 	push	(_windAngle + 2)
@@ -1293,30 +1322,203 @@ L012007?:
 L012012?:
 	ret
 ;------------------------------------------------------------
+;Allocation info for local variables in function 'calculateSteps'
+;------------------------------------------------------------
+;stepAngle                 Allocated to registers 
+;------------------------------------------------------------
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:472: void calculateSteps()
+;	-----------------------------------------
+;	 function calculateSteps
+;	-----------------------------------------
+_calculateSteps:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:476: if((windAngle >= stepAngle) & (windAngle <= (360.0 - stepAngle))) 
+	clr	a
+	push	acc
+	push	acc
+	mov	a,#0x34
+	push	acc
+	mov	a,#0x41
+	push	acc
+	mov	dpl,_windAngle
+	mov	dph,(_windAngle + 1)
+	mov	b,(_windAngle + 2)
+	mov	a,(_windAngle + 3)
+	lcall	___fslt
+	mov	r2,dpl
+	mov	a,sp
+	add	a,#0xfc
+	mov	sp,a
+	mov	a,r2
+	cjne	a,#0x01,L013011?
+L013011?:
+	clr	a
+	rlc	a
+	mov	r2,a
+	push	ar2
+	clr	a
+	push	acc
+	mov	a,#0x60
+	push	acc
+	mov	a,#0xAE
+	push	acc
+	mov	a,#0x43
+	push	acc
+	mov	dpl,_windAngle
+	mov	dph,(_windAngle + 1)
+	mov	b,(_windAngle + 2)
+	mov	a,(_windAngle + 3)
+	lcall	___fsgt
+	mov	r3,dpl
+	mov	a,sp
+	add	a,#0xfc
+	mov	sp,a
+	pop	ar2
+	mov	a,r3
+	cjne	a,#0x01,L013012?
+L013012?:
+	clr	a
+	rlc	a
+	mov	r3,a
+	anl	a,r2
+	jnz	L013013?
+	ljmp	L013005?
+L013013?:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:478: moveStepperFlag = 1;
+	mov	_moveStepperFlag,#0x01
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:480: if(windAngle <= 180.0)
+	clr	a
+	push	acc
+	push	acc
+	mov	a,#0x34
+	push	acc
+	mov	a,#0x43
+	push	acc
+	mov	dpl,_windAngle
+	mov	dph,(_windAngle + 1)
+	mov	b,(_windAngle + 2)
+	mov	a,(_windAngle + 3)
+	lcall	___fsgt
+	mov	r2,dpl
+	mov	a,sp
+	add	a,#0xfc
+	mov	sp,a
+	mov	a,r2
+	jnz	L013002?
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:482: direction = 1;
+	mov	_direction,#0x01
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:483: stepsCCW = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:484: stepsCW = windAngle/stepAngle;
+	clr	a
+	mov	_stepsCCW,a
+	push	acc
+	push	acc
+	mov	a,#0x34
+	push	acc
+	mov	a,#0x41
+	push	acc
+	mov	dpl,_windAngle
+	mov	dph,(_windAngle + 1)
+	mov	b,(_windAngle + 2)
+	mov	a,(_windAngle + 3)
+	lcall	___fsdiv
+	mov	r2,dpl
+	mov	r3,dph
+	mov	r4,b
+	mov	r5,a
+	mov	a,sp
+	add	a,#0xfc
+	mov	sp,a
+	mov	dpl,r2
+	mov	dph,r3
+	mov	b,r4
+	mov	a,r5
+	lcall	___fs2uchar
+	mov	_stepsCW,dpl
+	ret
+L013002?:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:488: direction = 0;
+	mov	_direction,#0x00
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:489: stepsCW = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:490: stepsCCW = (windAngle - 180.0)/stepAngle;
+	clr	a
+	mov	_stepsCW,a
+	push	acc
+	push	acc
+	mov	a,#0x34
+	push	acc
+	mov	a,#0x43
+	push	acc
+	mov	dpl,_windAngle
+	mov	dph,(_windAngle + 1)
+	mov	b,(_windAngle + 2)
+	mov	a,(_windAngle + 3)
+	lcall	___fssub
+	mov	r2,dpl
+	mov	r3,dph
+	mov	r4,b
+	mov	r5,a
+	mov	a,sp
+	add	a,#0xfc
+	mov	sp,a
+	clr	a
+	push	acc
+	push	acc
+	mov	a,#0x34
+	push	acc
+	mov	a,#0x41
+	push	acc
+	mov	dpl,r2
+	mov	dph,r3
+	mov	b,r4
+	mov	a,r5
+	lcall	___fsdiv
+	mov	r2,dpl
+	mov	r3,dph
+	mov	r4,b
+	mov	r5,a
+	mov	a,sp
+	add	a,#0xfc
+	mov	sp,a
+	mov	dpl,r2
+	mov	dph,r3
+	mov	b,r4
+	mov	a,r5
+	lcall	___fs2uchar
+	mov	_stepsCCW,dpl
+	ret
+L013005?:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:495: moveStepperFlag = 0;
+	mov	_moveStepperFlag,#0x00
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:496: stepsCCW = 0;
+	mov	_stepsCCW,#0x00
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:497: stepsCW = 0;
+	mov	_stepsCW,#0x00
+	ret
+;------------------------------------------------------------
 ;Allocation info for local variables in function 'main'
 ;------------------------------------------------------------
-;vReadings                 Allocated with name '_main_vReadings_1_82'
-;voltages                  Allocated with name '_main_voltages_1_82'
-;measureCount              Allocated with name '_main_measureCount_1_82'
+;vReadings                 Allocated with name '_main_vReadings_1_90'
+;voltages                  Allocated with name '_main_voltages_1_90'
+;measureCount              Allocated with name '_main_measureCount_1_90'
 ;totalMeasurements         Allocated to registers 
 ;errorConstant             Allocated to registers 
 ;readingADCCounter         Allocated to registers r4 r5 
 ;readingADCTotalInterrupts Allocated to registers 
 ;sloc0                     Allocated with name '_main_sloc0_1_0'
 ;------------------------------------------------------------
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:424: void main (void) 
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:502: void main (void) 
 ;	-----------------------------------------
 ;	 function main
 ;	-----------------------------------------
 _main:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:432: int measureCount = 0;
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:437: int readingADCCounter = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:510: int measureCount = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:515: int readingADCCounter = 0;
 	clr	a
-	mov	_main_measureCount_1_82,a
-	mov	(_main_measureCount_1_82 + 1),a
+	mov	_main_measureCount_1_90,a
+	mov	(_main_measureCount_1_90 + 1),a
 	mov	r4,a
 	mov	r5,a
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:440: printf("\x1b[2J"); // Clear screen using ANSI escape sequence.
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:518: printf("\x1b[2J"); // Clear screen using ANSI escape sequence.
 	push	ar4
 	push	ar5
 	mov	a,#__str_0
@@ -1329,55 +1531,55 @@ _main:
 	dec	sp
 	dec	sp
 	dec	sp
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:442: ConfigurePins();
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:520: ConfigurePins();
 	lcall	_ConfigurePins
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:443: ConfigPCA0();
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:521: ConfigPCA0();
 	lcall	_ConfigPCA0
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:444: InitADC();
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:522: InitADC();
 	lcall	_InitADC
 	pop	ar5
 	pop	ar4
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:446: while(1) //Main loop of the program begins here
-L013010?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:450: if(adcFlag == 1)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:524: while(1) //Main loop of the program begins here
+L014010?:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:528: if(adcFlag == 1)
 	mov	a,#0x01
-	cjne	a,_adcFlag,L013018?
-	sjmp	L013019?
-L013018?:
-	ljmp	L013008?
-L013019?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:453: adcFlag = 0;
+	cjne	a,_adcFlag,L014018?
+	sjmp	L014019?
+L014018?:
+	ljmp	L014008?
+L014019?:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:531: adcFlag = 0;
 	mov	_adcFlag,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:456: if(readingADCCounter < readingADCTotalInterrupts)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:534: if(readingADCCounter < readingADCTotalInterrupts)
 	clr	c
 	mov	a,r4
-	subb	a,#0x0F
+	subb	a,#0x14
 	mov	a,r5
 	xrl	a,#0x80
 	subb	a,#0x80
-	jnc	L013005?
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:457: readingADCCounter++;
+	jnc	L014005?
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:535: readingADCCounter++;
 	inc	r4
-	cjne	r4,#0x00,L013021?
+	cjne	r4,#0x00,L014021?
 	inc	r5
-L013021?:
-	ljmp	L013008?
-L013005?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:461: if(measureCount < totalMeasurements)
+L014021?:
+	ljmp	L014008?
+L014005?:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:539: if(measureCount < totalMeasurements)
 	clr	c
-	mov	a,_main_measureCount_1_82
+	mov	a,_main_measureCount_1_90
 	subb	a,#0x14
-	mov	a,(_main_measureCount_1_82 + 1)
+	mov	a,(_main_measureCount_1_90 + 1)
 	xrl	a,#0x80
 	subb	a,#0x80
-	jc	L013022?
-	ljmp	L013002?
-L013022?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:464: voltages[0] += Volts_at_Pin(QFP32_MUX_P1_3);
-	mov	_main_sloc0_1_0,_main_voltages_1_82
-	mov	(_main_sloc0_1_0 + 1),(_main_voltages_1_82 + 1)
-	mov	(_main_sloc0_1_0 + 2),(_main_voltages_1_82 + 2)
-	mov	(_main_sloc0_1_0 + 3),(_main_voltages_1_82 + 3)
+	jc	L014022?
+	ljmp	L014002?
+L014022?:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:542: voltages[0] += Volts_at_Pin(QFP32_MUX_P1_3);
+	mov	_main_sloc0_1_0,_main_voltages_1_90
+	mov	(_main_sloc0_1_0 + 1),(_main_voltages_1_90 + 1)
+	mov	(_main_sloc0_1_0 + 2),(_main_voltages_1_90 + 2)
+	mov	(_main_sloc0_1_0 + 3),(_main_voltages_1_90 + 3)
 	mov	dpl,#0x09
 	lcall	_Volts_at_Pin
 	mov	r2,dpl
@@ -1400,15 +1602,15 @@ L013022?:
 	mov	a,sp
 	add	a,#0xfc
 	mov	sp,a
-	mov	_main_voltages_1_82,r2
-	mov	(_main_voltages_1_82 + 1),r3
-	mov	(_main_voltages_1_82 + 2),r6
-	mov	(_main_voltages_1_82 + 3),r7
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:465: voltages[1] += Volts_at_Pin(QFP32_MUX_P0_2);
-	mov	_main_sloc0_1_0,(_main_voltages_1_82 + 0x0004)
-	mov	(_main_sloc0_1_0 + 1),((_main_voltages_1_82 + 0x0004) + 1)
-	mov	(_main_sloc0_1_0 + 2),((_main_voltages_1_82 + 0x0004) + 2)
-	mov	(_main_sloc0_1_0 + 3),((_main_voltages_1_82 + 0x0004) + 3)
+	mov	_main_voltages_1_90,r2
+	mov	(_main_voltages_1_90 + 1),r3
+	mov	(_main_voltages_1_90 + 2),r6
+	mov	(_main_voltages_1_90 + 3),r7
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:543: voltages[1] += Volts_at_Pin(QFP32_MUX_P0_2);
+	mov	_main_sloc0_1_0,(_main_voltages_1_90 + 0x0004)
+	mov	(_main_sloc0_1_0 + 1),((_main_voltages_1_90 + 0x0004) + 1)
+	mov	(_main_sloc0_1_0 + 2),((_main_voltages_1_90 + 0x0004) + 2)
+	mov	(_main_sloc0_1_0 + 3),((_main_voltages_1_90 + 0x0004) + 3)
 	mov	dpl,#0x01
 	lcall	_Volts_at_Pin
 	mov	r2,dpl
@@ -1431,19 +1633,19 @@ L013022?:
 	mov	a,sp
 	add	a,#0xfc
 	mov	sp,a
-	mov	(_main_voltages_1_82 + 0x0004),r2
-	mov	((_main_voltages_1_82 + 0x0004) + 1),r3
-	mov	((_main_voltages_1_82 + 0x0004) + 2),r6
-	mov	((_main_voltages_1_82 + 0x0004) + 3),r7
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:468: measureCount++;
-	inc	_main_measureCount_1_82
+	mov	(_main_voltages_1_90 + 0x0004),r2
+	mov	((_main_voltages_1_90 + 0x0004) + 1),r3
+	mov	((_main_voltages_1_90 + 0x0004) + 2),r6
+	mov	((_main_voltages_1_90 + 0x0004) + 3),r7
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:546: measureCount++;
+	inc	_main_measureCount_1_90
 	clr	a
-	cjne	a,_main_measureCount_1_82,L013023?
-	inc	(_main_measureCount_1_82 + 1)
-L013023?:
-	ljmp	L013003?
-L013002?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:473: vReadings[0] = (voltages[0]/totalMeasurements) - errorConstant;
+	cjne	a,_main_measureCount_1_90,L014023?
+	inc	(_main_measureCount_1_90 + 1)
+L014023?:
+	ljmp	L014003?
+L014002?:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:551: vReadings[0] = (voltages[0]/totalMeasurements) - errorConstant;
 	clr	a
 	push	acc
 	push	acc
@@ -1451,10 +1653,10 @@ L013002?:
 	push	acc
 	mov	a,#0x41
 	push	acc
-	mov	dpl,_main_voltages_1_82
-	mov	dph,(_main_voltages_1_82 + 1)
-	mov	b,(_main_voltages_1_82 + 2)
-	mov	a,(_main_voltages_1_82 + 3)
+	mov	dpl,_main_voltages_1_90
+	mov	dph,(_main_voltages_1_90 + 1)
+	mov	b,(_main_voltages_1_90 + 2)
+	mov	a,(_main_voltages_1_90 + 3)
 	lcall	___fsdiv
 	mov	r2,dpl
 	mov	r3,dph
@@ -1463,11 +1665,10 @@ L013002?:
 	mov	a,sp
 	add	a,#0xfc
 	mov	sp,a
-	mov	a,#0xB8
+	mov	a,#0x9A
 	push	acc
-	mov	a,#0x1E
+	mov	a,#0x99
 	push	acc
-	mov	a,#0x05
 	push	acc
 	mov	a,#0x3E
 	push	acc
@@ -1483,11 +1684,11 @@ L013002?:
 	mov	a,sp
 	add	a,#0xfc
 	mov	sp,a
-	mov	_main_vReadings_1_82,_main_sloc0_1_0
-	mov	(_main_vReadings_1_82 + 1),(_main_sloc0_1_0 + 1)
-	mov	(_main_vReadings_1_82 + 2),(_main_sloc0_1_0 + 2)
-	mov	(_main_vReadings_1_82 + 3),(_main_sloc0_1_0 + 3)
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:474: vReadings[1] = (voltages[1]/totalMeasurements) - errorConstant;
+	mov	_main_vReadings_1_90,_main_sloc0_1_0
+	mov	(_main_vReadings_1_90 + 1),(_main_sloc0_1_0 + 1)
+	mov	(_main_vReadings_1_90 + 2),(_main_sloc0_1_0 + 2)
+	mov	(_main_vReadings_1_90 + 3),(_main_sloc0_1_0 + 3)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:552: vReadings[1] = (voltages[1]/totalMeasurements) - errorConstant;
 	clr	a
 	push	acc
 	push	acc
@@ -1495,10 +1696,10 @@ L013002?:
 	push	acc
 	mov	a,#0x41
 	push	acc
-	mov	dpl,(_main_voltages_1_82 + 0x0004)
-	mov	dph,((_main_voltages_1_82 + 0x0004) + 1)
-	mov	b,((_main_voltages_1_82 + 0x0004) + 2)
-	mov	a,((_main_voltages_1_82 + 0x0004) + 3)
+	mov	dpl,(_main_voltages_1_90 + 0x0004)
+	mov	dph,((_main_voltages_1_90 + 0x0004) + 1)
+	mov	b,((_main_voltages_1_90 + 0x0004) + 2)
+	mov	a,((_main_voltages_1_90 + 0x0004) + 3)
 	lcall	___fsdiv
 	mov	r2,dpl
 	mov	r3,dph
@@ -1507,11 +1708,10 @@ L013002?:
 	mov	a,sp
 	add	a,#0xfc
 	mov	sp,a
-	mov	a,#0xB8
+	mov	a,#0x9A
 	push	acc
-	mov	a,#0x1E
+	mov	a,#0x99
 	push	acc
-	mov	a,#0x05
 	push	acc
 	mov	a,#0x3E
 	push	acc
@@ -1527,11 +1727,11 @@ L013002?:
 	mov	a,sp
 	add	a,#0xfc
 	mov	sp,a
-	mov	(_main_vReadings_1_82 + 0x0004),r2
-	mov	((_main_vReadings_1_82 + 0x0004) + 1),r3
-	mov	((_main_vReadings_1_82 + 0x0004) + 2),r6
-	mov	((_main_vReadings_1_82 + 0x0004) + 3),r7
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:477: printf("V(P1.3)=%3.2fV, V(P0.2)=%3.2fV Wind = %.2f degrees\r", vReadings[0], vReadings[1], windAngle);
+	mov	(_main_vReadings_1_90 + 0x0004),r2
+	mov	((_main_vReadings_1_90 + 0x0004) + 1),r3
+	mov	((_main_vReadings_1_90 + 0x0004) + 2),r6
+	mov	((_main_vReadings_1_90 + 0x0004) + 3),r7
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:555: printf("V(P1.3)=%3.2fV, V(P0.2)=%3.2fV Wind = %.2f degrees\r", vReadings[0], vReadings[1], windAngle);
 	push	_windAngle
 	push	(_windAngle + 1)
 	push	(_windAngle + 2)
@@ -1554,32 +1754,34 @@ L013002?:
 	mov	a,sp
 	add	a,#0xf1
 	mov	sp,a
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:480: measureCount = 0;
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:481: voltages[0] = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:558: measureCount = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:559: voltages[0] = 0;
 	clr a
-	mov _main_measureCount_1_82,a
-	mov (_main_measureCount_1_82 + 1),a
-	mov _main_voltages_1_82,a
-	mov (_main_voltages_1_82 + 1),a
-	mov (_main_voltages_1_82 + 2),a
-	mov (_main_voltages_1_82 + 3),a
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:482: voltages[1] = 0;
-	mov	(_main_voltages_1_82 + 0x0004),#0x00
-	mov	((_main_voltages_1_82 + 0x0004) + 1),#0x00
-	mov	((_main_voltages_1_82 + 0x0004) + 2),#0x00
-	mov	((_main_voltages_1_82 + 0x0004) + 3),#0x00
-L013003?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:486: readingADCCounter = 0;
+	mov _main_measureCount_1_90,a
+	mov (_main_measureCount_1_90 + 1),a
+	mov _main_voltages_1_90,a
+	mov (_main_voltages_1_90 + 1),a
+	mov (_main_voltages_1_90 + 2),a
+	mov (_main_voltages_1_90 + 3),a
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:560: voltages[1] = 0;
+	mov	(_main_voltages_1_90 + 0x0004),#0x00
+	mov	((_main_voltages_1_90 + 0x0004) + 1),#0x00
+	mov	((_main_voltages_1_90 + 0x0004) + 2),#0x00
+	mov	((_main_voltages_1_90 + 0x0004) + 3),#0x00
+L014003?:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:564: readingADCCounter = 0;
 	mov	r4,#0x00
 	mov	r5,#0x00
-L013008?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:493: wsReadByte();		
+L014008?:
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:568: wsReadByte();
 	push	ar4
 	push	ar5
 	lcall	_wsReadByte
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:571: calculateSteps();
+	lcall	_calculateSteps
 	pop	ar5
 	pop	ar4
-	ljmp	L013010?
+	ljmp	L014010?
 	rseg R_CSEG
 
 	rseg R_XINIT

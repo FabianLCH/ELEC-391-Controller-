@@ -32,7 +32,7 @@ Professor Jesus Calvino-Fraga from the University of British Columbia.
 #define VDD 3.291 
 
 //Timer 2 default frequency (used to control time between steps)
-#define TIMER_2_FREQ 1000L //Generate interrupts every 1.25us
+#define TIMER_2_FREQ 1000L //Generate interrupts every 1ms
 #define TIMER_3_FREQ 1000000L //Generate interrupts every 1us
 
 // SPI0 pins
@@ -49,20 +49,29 @@ Professor Jesus Calvino-Fraga from the University of British Columbia.
 
 //ADC reading variables
 volatile unsigned char adcFlag = 1;
+
+//Stepper motor control variables
 volatile unsigned char direction = 1;
+volatile unsigned char moveStepperFlag = 0;
+
+volatile unsigned char stepsCW = 0;
+volatile unsigned char stepsCCW = 0;
+
 
 //Flag used for delay_us function
 volatile unsigned char delayFlag = 0;
 
 //Stepper motor driving control variables
-volatile unsigned char stepCount = 0;
+volatile unsigned char stepNumber = 0;
 volatile unsigned char interruptCount = 0;
 
 //Total number of steps taken 
 int totalSteps = 0;
 
-//Wind sensor reading through SPI variables
-float windAngle = 0;
+//Angle read by MLX90316 wind sensor
+float windAngle = 0;  
+
+//Read the incoming bytes from the SPI0 receive buffer
 unsigned int spiByteNum;
 unsigned int spiBytes[10];
 
@@ -133,7 +142,7 @@ char _c51_external_startup (void)
 
 	// Configure Uart 0
 	#if (((SYSCLK/BAUDRATE)/(2L*12L))>0xFFL)
-		#error Timer 0 reload value is incorrect because (SYSCLK/BAUDRATE)/(2L*12L) > 0xFF
+		#error Timer 1 reload value is incorrect because (SYSCLK/BAUDRATE)/(2L*12L) > 0xFF
 	#endif
 	SCON0 = 0x10;
 	TH1 = 0x100-((SYSCLK/BAUDRATE)/(2L*12L));
@@ -169,7 +178,8 @@ char _c51_external_startup (void)
 	return 0;
 }
 
-//Timer 2 drives the stepper motor
+///// Timer 2_ISR /////
+//	Timer 2 Interrupt Service Routine //
 void Timer2_ISR (void) interrupt INTERRUPT_TIMER2
 {
 	SFRPAGE=0x0;
@@ -178,94 +188,106 @@ void Timer2_ISR (void) interrupt INTERRUPT_TIMER2
 	//--------------------------------
 	//Motor control
 	//--------------------------------
-	if(interruptCount == 3)
-	{
-		interruptCount = 0;
-		if(direction == 1)
+	if(moveStepperFlag == 1)
+	{ 
+		if(interruptCount == 4)
 		{
-			if(stepCount == 0)
+			interruptCount = 0;
+			if(direction == 1)
 			{
-				PORT1 = 1;
-				PORT2 = 1;
-				PORT3 = 0;
-				PORT4 = 0;
-			}
-			else if(stepCount == 1)
-			{
-				PORT1 = 0;
-				PORT2 = 1;
-				PORT3 = 1;
-				PORT4 = 0;
-			}
-			else if(stepCount == 2)
-			{
-				PORT1 = 0;
-				PORT2 = 0;
-				PORT3 = 1;
-				PORT4 = 1;
+				if(stepsCW != 0)
+				{
+					if(stepNumber == 0)
+					{
+						PORT1 = 1;
+						PORT2 = 1;
+						PORT3 = 0;
+						PORT4 = 0;
+					}
+					else if(stepNumber == 1)
+					{
+						PORT1 = 0;
+						PORT2 = 1;
+						PORT3 = 1;
+						PORT4 = 0;
+					}
+					else if(stepNumber == 2)
+					{
+						PORT1 = 0;
+						PORT2 = 0;
+						PORT3 = 1;
+						PORT4 = 1;
+					}
+					else
+					{
+						PORT1 = 1;
+						PORT2 = 0;
+						PORT3 = 0;
+						PORT4 = 1;
+					}
+				}
 			}
 			else
 			{
-				PORT1 = 1;
-				PORT2 = 0;
-				PORT3 = 0;
-				PORT4 = 1;
+				if(stepsCCW != 0)
+				{
+					if(stepNumber == 0)
+					{
+						PORT1 = 1;
+						PORT2 = 0;
+						PORT3 = 0;
+						PORT4 = 1;
+					}
+					else if(stepNumber == 1)
+					{
+						PORT1 = 0;
+						PORT2 = 0;
+						PORT3 = 1;
+						PORT4 = 1;
+					}
+					else if(stepNumber == 2)
+					{
+						PORT1 = 0;
+						PORT2 = 1;
+						PORT3 = 1;
+						PORT4 = 0;
+					}
+					else
+					{
+						PORT1 = 1;
+						PORT2 = 1;
+						PORT3 = 0;
+						PORT4 = 1;
+					}
+				}
+				
 			}
+			
+			stepNumber++;
+			totalSteps++;
+			if(stepNumber > 3)
+				stepNumber = 0;
 		}
 		else
-		{
-			if(stepCount == 0)
-			{
-				PORT1 = 1;
-				PORT2 = 0;
-				PORT3 = 0;
-				PORT4 = 1;
-			}
-			else if(stepCount == 1)
-			{
-				PORT1 = 0;
-				PORT2 = 0;
-				PORT3 = 1;
-				PORT4 = 1;
-			}
-			else if(stepCount == 2)
-			{
-				PORT1 = 0;
-				PORT2 = 1;
-				PORT3 = 1;
-				PORT4 = 0;
-			}
-			else
-			{
-				PORT1 = 1;
-				PORT2 = 1;
-				PORT3 = 0;
-				PORT4 = 1;
-			}
-			
-			
-		}
-		
-		stepCount++;
-		totalSteps++;
-		if(stepCount > 3)
-			stepCount = 0;
+			interruptCount++;
 	}
-	else
-		interruptCount++;
 
 }
-
+///// Timer 3 ISR /////
+//	Timer 3 Interrupt Service Routine //
 void Timer3_ISR (void) interrupt INTERRUPT_TIMER3
 {
 	SFRPAGE=0x0;
 	TMR3CN0&=0b_0011_1111; // Clear Timer3 interrupt flags
-	
-	TIMER_OUT_2 = !TIMER_OUT_2;
+
 	adcFlag = 1;
 	delayFlag = 1;
 }
 
+/*  --- delay_us ---
+* 	Delay the execution of the next instruction by a specified
+*	amount of microseconds using Timer 3
+*/
 void delay_us(int us)
 {
 	int countus = 0;
@@ -282,6 +304,10 @@ void delay_us(int us)
 	}
 }
 
+/*  --- InitADC ---
+* 	Initialize the micocontroller's ADC module with
+*	the desired parameters
+*/
 void InitADC (void)
 {
 	SFRPAGE = 0x00;
@@ -294,6 +320,9 @@ void InitADC (void)
 	ADEN=1; // Enable ADC
 }
 
+/*  --- ADC_at_Pin ---
+* 	Read the ADC value from an input pin and return it	
+*/
 unsigned int ADC_at_Pin(unsigned char pin)
 {
 	ADC0MX = pin;   // Select input from pin
@@ -304,11 +333,19 @@ unsigned int ADC_at_Pin(unsigned char pin)
 	return (ADC0);
 }
 
+/*  --- Volts_at_Pin ---
+* 	Calculate the voltage at an input pin
+*	based on the data read from the ADC
+*/
 float Volts_at_Pin(unsigned char pin)
 {
 	 return ((ADC_at_Pin(pin)*VDD)/16383.0);
 }
 
+/*  --- ConfigPCA0 ---
+* 	Configure the PCA0 to generate a PWM signal using
+*	one of the module's internal counters.
+*/
 void ConfigPCA0()
 {
 	SFRPAGE = 0x00; //Navigate to SFR page for register write
@@ -328,6 +365,9 @@ void ConfigPCA0()
 	
 }
 
+/*  --- ConfigurePins ---
+*	Configure the input and output pins correspondingly 	
+*/
 void ConfigurePins()
 {	
 	SFRPAGE = 0x20;
@@ -352,6 +392,10 @@ void ConfigurePins()
 	SFRPAGE = 0x00;	
 }
 
+/*  --- SPIWrite ---
+* 	Write a byte of data to the SPI transfer buffer and
+*	send the data to the selected SPI slave device.
+*/
 void SPIWrite (unsigned char transfer)
 {
    SPI0DAT = transfer; //Store the data to transmit in the SPI0 register
@@ -365,8 +409,8 @@ void SPIWrite (unsigned char transfer)
 */
 void wsReadByte() 
 {
-//Variables used to calculate and display angle read by wind sensor
-unsigned long temp;
+	//Variables used to calculate and display angle read by wind sensor
+	unsigned long tempNormal;
 
 	if(spiByteNum < 2)
 	{
@@ -409,16 +453,50 @@ unsigned long temp;
 
 			spiByteNum = 0; //Reset the transfer array number
 
-			if((spiBytes[3] & 1) == 1) //If the data is valid (if the LSB is 1, the data is valid)
+			tempNormal = (spiBytes[2] << 8) + spiBytes[3]; //Save the angle data 
+			
+			if((spiBytes[3] & 1) == 1) //If the data read is accurate (if the LSB is 1, the data is valid)
 			{
-				
-				temp = (spiBytes[2] << 8) + spiBytes[3]; //Save the angle in a temporary register
-				
-				windAngle = (temp >> 2); //Shift the angle to the right twice
+				windAngle = (tempNormal >> 2); //Shift the angle to the right twice
 				windAngle *= (3600.0/163840.0); //Convert the angle to degrees
 			}
+			
 		}
 	}	
+}
+
+/*  --- calculateSteps ---
+* 	Find the direction and the steps to be taken by
+*	the stepper motor to align the turbine.
+*/
+void calculateSteps()
+{
+	float stepAngle = 11.25;
+
+	if((windAngle >= stepAngle) & (windAngle <= (360.0 - stepAngle))) 
+	{
+		moveStepperFlag = 1;
+		
+		if(windAngle <= 180.0)
+		{
+			direction = 1;
+			stepsCCW = 0;
+			stepsCW = windAngle/stepAngle;
+		}
+		else
+		{
+			direction = 0;
+			stepsCW = 0;
+			stepsCCW = (windAngle - 180.0)/stepAngle;
+		}
+	}
+	else 
+	{
+		moveStepperFlag = 0;
+		stepsCCW = 0;
+		stepsCW = 0;
+	}
+	
 }
 
 void main (void) 
@@ -431,11 +509,11 @@ void main (void)
 	//Variables used to control the amount of measurements of the ADC to take before writing a voltage reading
 	int measureCount = 0;
 	int totalMeasurements = 20;
-	float errorConstant = 0.13;
+	float errorConstant = 0.30;
 
 	//Variables used to control the frequency of ADC measurements
 	int readingADCCounter = 0;
-	int readingADCTotalInterrupts = 15;
+	int readingADCTotalInterrupts = 20;
 		
 	printf("\x1b[2J"); // Clear screen using ANSI escape sequence.
 		
@@ -472,10 +550,10 @@ void main (void)
 					//Store the readings in separate variables that are only updated every 10 readings
 					vReadings[0] = (voltages[0]/totalMeasurements) - errorConstant;
 					vReadings[1] = (voltages[1]/totalMeasurements) - errorConstant;
-					
+				
 					//Print the results to the terminal
 					printf("V(P1.3)=%3.2fV, V(P0.2)=%3.2fV Wind = %.2f degrees\r", vReadings[0], vReadings[1], windAngle);
-				
+
 					//Reset the voltages reading variables 
 					measureCount = 0;
 					voltages[0] = 0;
@@ -485,13 +563,12 @@ void main (void)
 				//Reset the ADC interrupts counter
 				readingADCCounter = 0;
 			}
-			
-			
-			
 		}
-		
-	wsReadByte();		
+	//Read data from the wind sensor
+	wsReadByte();
 
+	//Calculate the amount of steps to be taken by the stepper motor		
+	calculateSteps();
 	}
 	
 }

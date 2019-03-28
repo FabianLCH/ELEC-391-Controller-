@@ -1,7 +1,7 @@
 ;--------------------------------------------------------
 ; File Created by C51
 ; Version 1.0.0 #1069 (Apr 23 2015) (MSVC)
-; This file was generated Tue Mar 19 08:46:43 2019
+; This file was generated Fri Mar 22 14:38:53 2019
 ;--------------------------------------------------------
 $name PCA
 $optc51 --model-small
@@ -738,26 +738,26 @@ _Timer2_ISR:
 	mov	_SFRPAGE,#0x00
 ;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:186: TF2H = 0; // Clear Timer2 interrupt flag
 	clr	_TF2H
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:191: if(moveStepperFlag == 1)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:191: if(moveStepperFlag == 1) //If rotation is enabled
 	mov	a,#0x01
 	cjne	a,_moveStepperFlag,L003047?
 	sjmp	L003048?
 L003047?:
 	ljmp	L003033?
 L003048?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:193: if(interruptCount == 4)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:193: if(interruptCount == 4) //Check if timing constraint for the stepper motor coils is met
 	mov	a,#0x04
 	cjne	a,_interruptCount,L003049?
 	sjmp	L003050?
 L003049?:
 	ljmp	L003029?
 L003050?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:195: interruptCount = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:195: interruptCount = 0; //Reset the interrupt counter
 	mov	_interruptCount,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:196: if(direction == 1)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:196: if(direction == 1) //Check for clockwise movement direction
 	mov	a,#0x01
 	cjne	a,_direction,L003024?
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:198: if(stepsCW != 0)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:198: if(stepsCW != 0) 
 	mov	a,_stepsCW
 	jnz	L003053?
 	ljmp	L003025?
@@ -1083,8 +1083,8 @@ _ConfigPCA0:
 	mov	_PCA0CN0,#0x40
 ;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:363: PCA0CPM0 = 0b_0100_0010;//Configure Channel 0 to function in 8-bit PWM mode
 	mov	_PCA0CPM0,#0x42
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:364: PCA0CPH0 = 128; //Load the PCA0CP0 high byte 
-	mov	_PCA0CPH0,#0x80
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:364: PCA0CPH0 = 77; //Load the PCA0CP0 high byte 
+	mov	_PCA0CPH0,#0x4D
 	ret
 ;------------------------------------------------------------
 ;Allocation info for local variables in function 'ConfigurePins'
@@ -1331,7 +1331,7 @@ L012012?:
 ;	 function calculateSteps
 ;	-----------------------------------------
 _calculateSteps:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:476: if((windAngle >= stepAngle) & (windAngle <= (360.0 - stepAngle))) 
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:477: if((windAngle >= stepAngle) & (windAngle <= (360.0 - stepAngle))) 
 	clr	a
 	push	acc
 	push	acc
@@ -1383,9 +1383,9 @@ L013012?:
 	jnz	L013013?
 	ljmp	L013005?
 L013013?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:478: moveStepperFlag = 1;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:480: moveStepperFlag = 1;
 	mov	_moveStepperFlag,#0x01
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:480: if(windAngle <= 180.0)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:483: if(windAngle <= 180.0) 
 	clr	a
 	push	acc
 	push	acc
@@ -1404,12 +1404,10 @@ L013013?:
 	mov	sp,a
 	mov	a,r2
 	jnz	L013002?
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:482: direction = 1;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:485: direction = 1;
 	mov	_direction,#0x01
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:483: stepsCCW = 0;
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:484: stepsCW = windAngle/stepAngle;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:486: stepsCW = windAngle/stepAngle;
 	clr	a
-	mov	_stepsCCW,a
 	push	acc
 	push	acc
 	mov	a,#0x34
@@ -1436,12 +1434,10 @@ L013013?:
 	mov	_stepsCW,dpl
 	ret
 L013002?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:488: direction = 0;
-	mov	_direction,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:489: stepsCW = 0;
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:490: stepsCCW = (windAngle - 180.0)/stepAngle;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:490: direction = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:491: stepsCCW = (windAngle - 180.0)/stepAngle;
 	clr	a
-	mov	_stepsCW,a
+	mov	_direction,a
 	push	acc
 	push	acc
 	mov	a,#0x34
@@ -1487,11 +1483,11 @@ L013002?:
 	mov	_stepsCCW,dpl
 	ret
 L013005?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:495: moveStepperFlag = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:496: moveStepperFlag = 0;
 	mov	_moveStepperFlag,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:496: stepsCCW = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:497: stepsCCW = 0;
 	mov	_stepsCCW,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:497: stepsCW = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:498: stepsCW = 0;
 	mov	_stepsCW,#0x00
 	ret
 ;------------------------------------------------------------
@@ -1506,19 +1502,19 @@ L013005?:
 ;readingADCTotalInterrupts Allocated to registers 
 ;sloc0                     Allocated with name '_main_sloc0_1_0'
 ;------------------------------------------------------------
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:502: void main (void) 
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:503: void main (void) 
 ;	-----------------------------------------
 ;	 function main
 ;	-----------------------------------------
 _main:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:510: int measureCount = 0;
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:515: int readingADCCounter = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:511: int measureCount = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:516: int readingADCCounter = 0;
 	clr	a
 	mov	_main_measureCount_1_90,a
 	mov	(_main_measureCount_1_90 + 1),a
 	mov	r4,a
 	mov	r5,a
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:518: printf("\x1b[2J"); // Clear screen using ANSI escape sequence.
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:519: printf("\x1b[2J"); // Clear screen using ANSI escape sequence.
 	push	ar4
 	push	ar5
 	mov	a,#__str_0
@@ -1531,26 +1527,26 @@ _main:
 	dec	sp
 	dec	sp
 	dec	sp
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:520: ConfigurePins();
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:521: ConfigurePins();
 	lcall	_ConfigurePins
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:521: ConfigPCA0();
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:522: ConfigPCA0();
 	lcall	_ConfigPCA0
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:522: InitADC();
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:523: InitADC();
 	lcall	_InitADC
 	pop	ar5
 	pop	ar4
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:524: while(1) //Main loop of the program begins here
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:525: while(1) //Main loop of the program begins here
 L014010?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:528: if(adcFlag == 1)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:529: if(adcFlag == 1)
 	mov	a,#0x01
 	cjne	a,_adcFlag,L014018?
 	sjmp	L014019?
 L014018?:
 	ljmp	L014008?
 L014019?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:531: adcFlag = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:532: adcFlag = 0;
 	mov	_adcFlag,#0x00
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:534: if(readingADCCounter < readingADCTotalInterrupts)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:535: if(readingADCCounter < readingADCTotalInterrupts)
 	clr	c
 	mov	a,r4
 	subb	a,#0x14
@@ -1558,14 +1554,14 @@ L014019?:
 	xrl	a,#0x80
 	subb	a,#0x80
 	jnc	L014005?
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:535: readingADCCounter++;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:536: readingADCCounter++;
 	inc	r4
 	cjne	r4,#0x00,L014021?
 	inc	r5
 L014021?:
 	ljmp	L014008?
 L014005?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:539: if(measureCount < totalMeasurements)
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:540: if(measureCount < totalMeasurements)
 	clr	c
 	mov	a,_main_measureCount_1_90
 	subb	a,#0x14
@@ -1575,7 +1571,7 @@ L014005?:
 	jc	L014022?
 	ljmp	L014002?
 L014022?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:542: voltages[0] += Volts_at_Pin(QFP32_MUX_P1_3);
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:543: voltages[0] += Volts_at_Pin(QFP32_MUX_P1_3);
 	mov	_main_sloc0_1_0,_main_voltages_1_90
 	mov	(_main_sloc0_1_0 + 1),(_main_voltages_1_90 + 1)
 	mov	(_main_sloc0_1_0 + 2),(_main_voltages_1_90 + 2)
@@ -1606,7 +1602,7 @@ L014022?:
 	mov	(_main_voltages_1_90 + 1),r3
 	mov	(_main_voltages_1_90 + 2),r6
 	mov	(_main_voltages_1_90 + 3),r7
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:543: voltages[1] += Volts_at_Pin(QFP32_MUX_P0_2);
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:544: voltages[1] += Volts_at_Pin(QFP32_MUX_P0_2);
 	mov	_main_sloc0_1_0,(_main_voltages_1_90 + 0x0004)
 	mov	(_main_sloc0_1_0 + 1),((_main_voltages_1_90 + 0x0004) + 1)
 	mov	(_main_sloc0_1_0 + 2),((_main_voltages_1_90 + 0x0004) + 2)
@@ -1637,7 +1633,7 @@ L014022?:
 	mov	((_main_voltages_1_90 + 0x0004) + 1),r3
 	mov	((_main_voltages_1_90 + 0x0004) + 2),r6
 	mov	((_main_voltages_1_90 + 0x0004) + 3),r7
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:546: measureCount++;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:547: measureCount++;
 	inc	_main_measureCount_1_90
 	clr	a
 	cjne	a,_main_measureCount_1_90,L014023?
@@ -1645,7 +1641,7 @@ L014022?:
 L014023?:
 	ljmp	L014003?
 L014002?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:551: vReadings[0] = (voltages[0]/totalMeasurements) - errorConstant;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:552: vReadings[0] = (voltages[0]/totalMeasurements) - errorConstant;
 	clr	a
 	push	acc
 	push	acc
@@ -1688,7 +1684,7 @@ L014002?:
 	mov	(_main_vReadings_1_90 + 1),(_main_sloc0_1_0 + 1)
 	mov	(_main_vReadings_1_90 + 2),(_main_sloc0_1_0 + 2)
 	mov	(_main_vReadings_1_90 + 3),(_main_sloc0_1_0 + 3)
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:552: vReadings[1] = (voltages[1]/totalMeasurements) - errorConstant;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:553: vReadings[1] = (voltages[1]/totalMeasurements) - errorConstant;
 	clr	a
 	push	acc
 	push	acc
@@ -1731,7 +1727,7 @@ L014002?:
 	mov	((_main_vReadings_1_90 + 0x0004) + 1),r3
 	mov	((_main_vReadings_1_90 + 0x0004) + 2),r6
 	mov	((_main_vReadings_1_90 + 0x0004) + 3),r7
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:555: printf("V(P1.3)=%3.2fV, V(P0.2)=%3.2fV Wind = %.2f degrees\r", vReadings[0], vReadings[1], windAngle);
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:556: printf("V(P1.3)=%3.2fV, V(P0.2)=%3.2fV Wind = %.2f degrees\r", vReadings[0], vReadings[1], windAngle);
 	push	_windAngle
 	push	(_windAngle + 1)
 	push	(_windAngle + 2)
@@ -1754,8 +1750,8 @@ L014002?:
 	mov	a,sp
 	add	a,#0xf1
 	mov	sp,a
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:558: measureCount = 0;
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:559: voltages[0] = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:559: measureCount = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:560: voltages[0] = 0;
 	clr a
 	mov _main_measureCount_1_90,a
 	mov (_main_measureCount_1_90 + 1),a
@@ -1763,21 +1759,21 @@ L014002?:
 	mov (_main_voltages_1_90 + 1),a
 	mov (_main_voltages_1_90 + 2),a
 	mov (_main_voltages_1_90 + 3),a
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:560: voltages[1] = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:561: voltages[1] = 0;
 	mov	(_main_voltages_1_90 + 0x0004),#0x00
 	mov	((_main_voltages_1_90 + 0x0004) + 1),#0x00
 	mov	((_main_voltages_1_90 + 0x0004) + 2),#0x00
 	mov	((_main_voltages_1_90 + 0x0004) + 3),#0x00
 L014003?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:564: readingADCCounter = 0;
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:565: readingADCCounter = 0;
 	mov	r4,#0x00
 	mov	r5,#0x00
 L014008?:
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:568: wsReadByte();
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:569: wsReadByte();
 	push	ar4
 	push	ar5
 	lcall	_wsReadByte
-;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:571: calculateSteps();
+;	C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:572: calculateSteps();
 	lcall	_calculateSteps
 	pop	ar5
 	pop	ar4

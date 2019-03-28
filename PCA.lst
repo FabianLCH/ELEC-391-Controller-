@@ -1,7 +1,7 @@
 0000              1   ;--------------------------------------------------------
 0000              2   ; File Created by C51
 0000              3   ; Version 1.0.0 #1069 (Apr 23 2015) (MSVC)
-0000              4   ; This file was generated Tue Mar 19 08:46:43 2019
+0000              4   ; This file was generated Fri Mar 22 14:38:53 2019
 0000              5   ;--------------------------------------------------------
                   5   $name PCA
                   6   $optc51 --model-small
@@ -738,26 +738,26 @@
 0097 75A700     738            mov     _SFRPAGE,#0x00
 009A            739   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:186: TF2H = 0; // Clear Timer2 interrupt flag
 009A C2CF       740            clr     _TF2H
-009C            741   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:191: if(moveStepperFlag == 1)
+009C            741   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:191: if(moveStepperFlag == 1) //If rotation is enabled
 009C 7401       742            mov     a,#0x01
 009E B5B0E0     743            cjne    a,_moveStepperFlag,L003047?
 00A1 8001       744            sjmp    L003048?
 00A3            745   L003047?:
 00A3 020100     746            ljmp    L003033?
 00A6            747   L003048?:
-00A6            748   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:193: if(interruptCount == 4)
+00A6            748   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:193: if(interruptCount == 4) //Check if timing constraint for the stepper motor coils is met
 00A6 7404       749            mov     a,#0x04
 00A8 B578A0     750            cjne    a,_interruptCount,L003049?
 00AB 8001       751            sjmp    L003050?
 00AD            752   L003049?:
 00AD 020100     753            ljmp    L003029?
 00B0            754   L003050?:
-00B0            755   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:195: interruptCount = 0;
+00B0            755   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:195: interruptCount = 0; //Reset the interrupt counter
 00B0 757800     756            mov     _interruptCount,#0x00
-00B3            757   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:196: if(direction == 1)
+00B3            757   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:196: if(direction == 1) //Check for clockwise movement direction
 00B3 7401       758            mov     a,#0x01
 00B5 B5F060     759            cjne    a,_direction,L003024?
-00B8            760   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:198: if(stepsCW != 0)
+00B8            760   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:198: if(stepsCW != 0) 
 00B8 E560       761            mov     a,_stepsCW
 00BA 7001       762            jnz     L003053?
 00BC 020100     763            ljmp    L003025?
@@ -1083,8 +1083,8 @@
 0219 75D840    1083            mov     _PCA0CN0,#0x40
 021C           1084   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:363: PCA0CPM0 = 0b_0100_0010;//Configure Channel 0 to function in 8-bit PWM mode
 021C 75DA42    1085            mov     _PCA0CPM0,#0x42
-021F           1086   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:364: PCA0CPH0 = 128; //Load the PCA0CP0 high byte 
-021F 75FC80    1087            mov     _PCA0CPH0,#0x80
+021F           1086   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:364: PCA0CPH0 = 77; //Load the PCA0CP0 high byte 
+021F 75FC4D    1087            mov     _PCA0CPH0,#0x4D
 0222 22        1088            ret
 0223           1089   ;------------------------------------------------------------
 0223           1090   ;Allocation info for local variables in function 'ConfigurePins'
@@ -1331,7 +1331,7 @@
 035A           1331   ;         function calculateSteps
 035A           1332   ;        -----------------------------------------
 035A           1333   _calculateSteps:
-035A           1334   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:476: if((windAngle >= stepAngle) & (windAngle <= (360.0 - stepAngle))) 
+035A           1334   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:477: if((windAngle >= stepAngle) & (windAngle <= (360.0 - stepAngle))) 
 035A E4        1335            clr     a
 035B C0E0      1336            push    acc
 035D C0E0      1337            push    acc
@@ -1383,9 +1383,9 @@
 03B5 7001      1383            jnz     L013013?
 03B7 020100    1384            ljmp    L013005?
 03BA           1385   L013013?:
-03BA           1386   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:478: moveStepperFlag = 1;
+03BA           1386   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:480: moveStepperFlag = 1;
 03BA 75B001    1387            mov     _moveStepperFlag,#0x01
-03BD           1388   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:480: if(windAngle <= 180.0)
+03BD           1388   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:483: if(windAngle <= 180.0) 
 03BD E4        1389            clr     a
 03BE C0E0      1390            push    acc
 03C0 C0E0      1391            push    acc
@@ -1404,395 +1404,391 @@
 03DE F581      1404            mov     sp,a
 03E0 EA        1405            mov     a,r2
 03E1 7001      1406            jnz     L013002?
-03E3           1407   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:482: direction = 1;
+03E3           1407   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:485: direction = 1;
 03E3 75F001    1408            mov     _direction,#0x01
-03E6           1409   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:483: stepsCCW = 0;
-03E6           1410   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:484: stepsCW = windAngle/stepAngle;
-03E6 E4        1411            clr     a
-03E7 F520      1412            mov     _stepsCCW,a
-03E9 C0E0      1413            push    acc
-03EB C0E0      1414            push    acc
-03ED 7434      1415            mov     a,#0x34
-03EF C0E0      1416            push    acc
-03F1 7441      1417            mov     a,#0x41
-03F3 C0E0      1418            push    acc
-03F5 851882    1419            mov     dpl,_windAngle
-03F8 851983    1420            mov     dph,(_windAngle + 1)
-03FB 851AF0    1421            mov     b,(_windAngle + 2)
-03FE E51B      1422            mov     a,(_windAngle + 3)
-0400 120100    1423            lcall   ___fsdiv
-0403 AA82      1424            mov     r2,dpl
-0405 AB83      1425            mov     r3,dph
-0407 ACF0      1426            mov     r4,b
-0409 FD        1427            mov     r5,a
-040A E581      1428            mov     a,sp
-040C 24FC      1429            add     a,#0xfc
-040E F581      1430            mov     sp,a
-0410 8A82      1431            mov     dpl,r2
-0412 8B83      1432            mov     dph,r3
-0414 8CF0      1433            mov     b,r4
-0416 ED        1434            mov     a,r5
-0417 120100    1435            lcall   ___fs2uchar
-041A 858260    1436            mov     _stepsCW,dpl
-041D 22        1437            ret
-041E           1438   L013002?:
-041E           1439   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:488: direction = 0;
-041E 75F000    1440            mov     _direction,#0x00
-0421           1441   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:489: stepsCW = 0;
-0421           1442   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:490: stepsCCW = (windAngle - 180.0)/stepAngle;
-0421 E4        1443            clr     a
-0422 F560      1444            mov     _stepsCW,a
-0424 C0E0      1445            push    acc
-0426 C0E0      1446            push    acc
-0428 7434      1447            mov     a,#0x34
-042A C0E0      1448            push    acc
-042C 7443      1449            mov     a,#0x43
-042E C0E0      1450            push    acc
-0430 851882    1451            mov     dpl,_windAngle
-0433 851983    1452            mov     dph,(_windAngle + 1)
-0436 851AF0    1453            mov     b,(_windAngle + 2)
-0439 E51B      1454            mov     a,(_windAngle + 3)
-043B 120100    1455            lcall   ___fssub
-043E AA82      1456            mov     r2,dpl
-0440 AB83      1457            mov     r3,dph
-0442 ACF0      1458            mov     r4,b
-0444 FD        1459            mov     r5,a
-0445 E581      1460            mov     a,sp
-0447 24FC      1461            add     a,#0xfc
-0449 F581      1462            mov     sp,a
-044B E4        1463            clr     a
-044C C0E0      1464            push    acc
-044E C0E0      1465            push    acc
-0450 7434      1466            mov     a,#0x34
-0452 C0E0      1467            push    acc
-0454 7441      1468            mov     a,#0x41
-0456 C0E0      1469            push    acc
-0458 8A82      1470            mov     dpl,r2
-045A 8B83      1471            mov     dph,r3
-045C 8CF0      1472            mov     b,r4
-045E ED        1473            mov     a,r5
-045F 120100    1474            lcall   ___fsdiv
-0462 AA82      1475            mov     r2,dpl
-0464 AB83      1476            mov     r3,dph
-0466 ACF0      1477            mov     r4,b
-0468 FD        1478            mov     r5,a
-0469 E581      1479            mov     a,sp
-046B 24FC      1480            add     a,#0xfc
-046D F581      1481            mov     sp,a
-046F 8A82      1482            mov     dpl,r2
-0471 8B83      1483            mov     dph,r3
-0473 8CF0      1484            mov     b,r4
-0475 ED        1485            mov     a,r5
-0476 120100    1486            lcall   ___fs2uchar
-0479 858220    1487            mov     _stepsCCW,dpl
-047C 22        1488            ret
-047D           1489   L013005?:
-047D           1490   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:495: moveStepperFlag = 0;
-047D 75B000    1491            mov     _moveStepperFlag,#0x00
-0480           1492   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:496: stepsCCW = 0;
-0480 752000    1493            mov     _stepsCCW,#0x00
-0483           1494   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:497: stepsCW = 0;
-0483 756000    1495            mov     _stepsCW,#0x00
-0486 22        1496            ret
-0487           1497   ;------------------------------------------------------------
-0487           1498   ;Allocation info for local variables in function 'main'
-0487           1499   ;------------------------------------------------------------
-0487           1500   ;vReadings                 Allocated with name '_main_vReadings_1_90'
-0487           1501   ;voltages                  Allocated with name '_main_voltages_1_90'
-0487           1502   ;measureCount              Allocated with name '_main_measureCount_1_90'
-0487           1503   ;totalMeasurements         Allocated to registers 
-0487           1504   ;errorConstant             Allocated to registers 
-0487           1505   ;readingADCCounter         Allocated to registers r4 r5 
-0487           1506   ;readingADCTotalInterrupts Allocated to registers 
-0487           1507   ;sloc0                     Allocated with name '_main_sloc0_1_0'
-0487           1508   ;------------------------------------------------------------
-0487           1509   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:502: void main (void) 
-0487           1510   ;        -----------------------------------------
-0487           1511   ;         function main
-0487           1512   ;        -----------------------------------------
-0487           1513   _main:
-0487           1514   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:510: int measureCount = 0;
-0487           1515   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:515: int readingADCCounter = 0;
-0487 E4        1516            clr     a
-0488 F5E0      1517            mov     _main_measureCount_1_90,a
-048A F5E1      1518            mov     (_main_measureCount_1_90 + 1),a
-048C FC        1519            mov     r4,a
-048D FD        1520            mov     r5,a
-048E           1521   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:518: printf("\x1b[2J"); // Clear screen using ANSI escape sequence.
-048E C004      1522            push    ar4
-0490 C005      1523            push    ar5
-0492 7428      1524            mov     a,#__str_0
-0494 C0E0      1525            push    acc
-0496 74C8      1526            mov     a,#(__str_0 >> 8)
-0498 C0E0      1527            push    acc
-049A 7480      1528            mov     a,#0x80
-049C C0E0      1529            push    acc
-049E 120100    1530            lcall   _printf
-04A1 1581      1531            dec     sp
-04A3 1581      1532            dec     sp
-04A5 1581      1533            dec     sp
-04A7           1534   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:520: ConfigurePins();
-04A7 120100    1535            lcall   _ConfigurePins
-04AA           1536   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:521: ConfigPCA0();
-04AA 120100    1537            lcall   _ConfigPCA0
-04AD           1538   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:522: InitADC();
-04AD 120100    1539            lcall   _InitADC
-04B0 D005      1540            pop     ar5
-04B2 D004      1541            pop     ar4
-04B4           1542   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:524: while(1) //Main loop of the program begins here
-04B4           1543   L014010?:
-04B4           1544   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:528: if(adcFlag == 1)
-04B4 7401      1545            mov     a,#0x01
-04B6 B530E8    1546            cjne    a,_adcFlag,L014018?
-04B9 8001      1547            sjmp    L014019?
-04BB           1548   L014018?:
-04BB 020100    1549            ljmp    L014008?
-04BE           1550   L014019?:
-04BE           1551   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:531: adcFlag = 0;
-04BE 753000    1552            mov     _adcFlag,#0x00
-04C1           1553   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:534: if(readingADCCounter < readingADCTotalInterrupts)
-04C1 C3        1554            clr     c
-04C2 EC        1555            mov     a,r4
-04C3 9414      1556            subb    a,#0x14
-04C5 ED        1557            mov     a,r5
-04C6 6480      1558            xrl     a,#0x80
-04C8 9480      1559            subb    a,#0x80
-04CA 5001      1560            jnc     L014005?
-04CC           1561   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:535: readingADCCounter++;
-04CC 0C        1562            inc     r4
-04CD BC00E8    1563            cjne    r4,#0x00,L014021?
-04D0 0D        1564            inc     r5
-04D1           1565   L014021?:
-04D1 020100    1566            ljmp    L014008?
-04D4           1567   L014005?:
-04D4           1568   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:539: if(measureCount < totalMeasurements)
-04D4 C3        1569            clr     c
-04D5 E5E0      1570            mov     a,_main_measureCount_1_90
-04D7 9414      1571            subb    a,#0x14
-04D9 E5E1      1572            mov     a,(_main_measureCount_1_90 + 1)
-04DB 6480      1573            xrl     a,#0x80
-04DD 9480      1574            subb    a,#0x80
-04DF 4001      1575            jc      L014022?
-04E1 020100    1576            ljmp    L014002?
-04E4           1577   L014022?:
-04E4           1578   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:542: voltages[0] += Volts_at_Pin(QFP32_MUX_P1_3);
-04E4 859020    1579            mov     _main_sloc0_1_0,_main_voltages_1_90
-04E7 859121    1580            mov     (_main_sloc0_1_0 + 1),(_main_voltages_1_90 + 1)
-04EA 859222    1581            mov     (_main_sloc0_1_0 + 2),(_main_voltages_1_90 + 2)
-04ED 859323    1582            mov     (_main_sloc0_1_0 + 3),(_main_voltages_1_90 + 3)
-04F0 758209    1583            mov     dpl,#0x09
-04F3 120100    1584            lcall   _Volts_at_Pin
-04F6 AA82      1585            mov     r2,dpl
-04F8 AB83      1586            mov     r3,dph
-04FA AEF0      1587            mov     r6,b
-04FC FF        1588            mov     r7,a
-04FD C002      1589            push    ar2
-04FF C003      1590            push    ar3
-0501 C006      1591            push    ar6
-0503 C007      1592            push    ar7
-0505 852082    1593            mov     dpl,_main_sloc0_1_0
-0508 852183    1594            mov     dph,(_main_sloc0_1_0 + 1)
-050B 8522F0    1595            mov     b,(_main_sloc0_1_0 + 2)
-050E E523      1596            mov     a,(_main_sloc0_1_0 + 3)
-0510 120100    1597            lcall   ___fsadd
-0513 AA82      1598            mov     r2,dpl
-0515 AB83      1599            mov     r3,dph
-0517 AEF0      1600            mov     r6,b
-0519 FF        1601            mov     r7,a
-051A E581      1602            mov     a,sp
-051C 24FC      1603            add     a,#0xfc
-051E F581      1604            mov     sp,a
-0520 8A90      1605            mov     _main_voltages_1_90,r2
-0522 8B91      1606            mov     (_main_voltages_1_90 + 1),r3
-0524 8E92      1607            mov     (_main_voltages_1_90 + 2),r6
-0526 8F93      1608            mov     (_main_voltages_1_90 + 3),r7
-0528           1609   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:543: voltages[1] += Volts_at_Pin(QFP32_MUX_P0_2);
-0528 859420    1610            mov     _main_sloc0_1_0,(_main_voltages_1_90 + 0x0004)
-052B 859521    1611            mov     (_main_sloc0_1_0 + 1),((_main_voltages_1_90 + 0x0004) + 1)
-052E 859622    1612            mov     (_main_sloc0_1_0 + 2),((_main_voltages_1_90 + 0x0004) + 2)
-0531 859723    1613            mov     (_main_sloc0_1_0 + 3),((_main_voltages_1_90 + 0x0004) + 3)
-0534 758201    1614            mov     dpl,#0x01
-0537 120100    1615            lcall   _Volts_at_Pin
-053A AA82      1616            mov     r2,dpl
-053C AB83      1617            mov     r3,dph
-053E AEF0      1618            mov     r6,b
-0540 FF        1619            mov     r7,a
-0541 C002      1620            push    ar2
-0543 C003      1621            push    ar3
-0545 C006      1622            push    ar6
-0547 C007      1623            push    ar7
-0549 852082    1624            mov     dpl,_main_sloc0_1_0
-054C 852183    1625            mov     dph,(_main_sloc0_1_0 + 1)
-054F 8522F0    1626            mov     b,(_main_sloc0_1_0 + 2)
-0552 E523      1627            mov     a,(_main_sloc0_1_0 + 3)
-0554 120100    1628            lcall   ___fsadd
-0557 AA82      1629            mov     r2,dpl
-0559 AB83      1630            mov     r3,dph
-055B AEF0      1631            mov     r6,b
-055D FF        1632            mov     r7,a
-055E E581      1633            mov     a,sp
-0560 24FC      1634            add     a,#0xfc
-0562 F581      1635            mov     sp,a
-0564 8A94      1636            mov     (_main_voltages_1_90 + 0x0004),r2
-0566 8B95      1637            mov     ((_main_voltages_1_90 + 0x0004) + 1),r3
-0568 8E96      1638            mov     ((_main_voltages_1_90 + 0x0004) + 2),r6
-056A 8F97      1639            mov     ((_main_voltages_1_90 + 0x0004) + 3),r7
-056C           1640   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:546: measureCount++;
-056C 05E0      1641            inc     _main_measureCount_1_90
-056E E4        1642            clr     a
-056F B5E0E8    1643            cjne    a,_main_measureCount_1_90,L014023?
-0572 05E1      1644            inc     (_main_measureCount_1_90 + 1)
-0574           1645   L014023?:
-0574 020100    1646            ljmp    L014003?
-0577           1647   L014002?:
-0577           1648   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:551: vReadings[0] = (voltages[0]/totalMeasurements) - errorConstant;
-0577 E4        1649            clr     a
-0578 C0E0      1650            push    acc
-057A C0E0      1651            push    acc
-057C 74A0      1652            mov     a,#0xA0
-057E C0E0      1653            push    acc
-0580 7441      1654            mov     a,#0x41
-0582 C0E0      1655            push    acc
-0584 859082    1656            mov     dpl,_main_voltages_1_90
-0587 859183    1657            mov     dph,(_main_voltages_1_90 + 1)
-058A 8592F0    1658            mov     b,(_main_voltages_1_90 + 2)
-058D E593      1659            mov     a,(_main_voltages_1_90 + 3)
-058F 120100    1660            lcall   ___fsdiv
-0592 AA82      1661            mov     r2,dpl
-0594 AB83      1662            mov     r3,dph
-0596 AEF0      1663            mov     r6,b
-0598 FF        1664            mov     r7,a
-0599 E581      1665            mov     a,sp
-059B 24FC      1666            add     a,#0xfc
-059D F581      1667            mov     sp,a
-059F 749A      1668            mov     a,#0x9A
-05A1 C0E0      1669            push    acc
-05A3 7499      1670            mov     a,#0x99
-05A5 C0E0      1671            push    acc
-05A7 C0E0      1672            push    acc
-05A9 743E      1673            mov     a,#0x3E
-05AB C0E0      1674            push    acc
-05AD 8A82      1675            mov     dpl,r2
-05AF 8B83      1676            mov     dph,r3
-05B1 8EF0      1677            mov     b,r6
-05B3 EF        1678            mov     a,r7
-05B4 120100    1679            lcall   ___fssub
-05B7 858220    1680            mov     _main_sloc0_1_0,dpl
-05BA 858321    1681            mov     (_main_sloc0_1_0 + 1),dph
-05BD 85F022    1682            mov     (_main_sloc0_1_0 + 2),b
-05C0 F523      1683            mov     (_main_sloc0_1_0 + 3),a
-05C2 E581      1684            mov     a,sp
-05C4 24FC      1685            add     a,#0xfc
-05C6 F581      1686            mov     sp,a
-05C8 852040    1687            mov     _main_vReadings_1_90,_main_sloc0_1_0
-05CB 852141    1688            mov     (_main_vReadings_1_90 + 1),(_main_sloc0_1_0 + 1)
-05CE 852242    1689            mov     (_main_vReadings_1_90 + 2),(_main_sloc0_1_0 + 2)
-05D1 852343    1690            mov     (_main_vReadings_1_90 + 3),(_main_sloc0_1_0 + 3)
-05D4           1691   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:552: vReadings[1] = (voltages[1]/totalMeasurements) - errorConstant;
-05D4 E4        1692            clr     a
-05D5 C0E0      1693            push    acc
-05D7 C0E0      1694            push    acc
-05D9 74A0      1695            mov     a,#0xA0
-05DB C0E0      1696            push    acc
-05DD 7441      1697            mov     a,#0x41
-05DF C0E0      1698            push    acc
-05E1 859482    1699            mov     dpl,(_main_voltages_1_90 + 0x0004)
-05E4 859583    1700            mov     dph,((_main_voltages_1_90 + 0x0004) + 1)
-05E7 8596F0    1701            mov     b,((_main_voltages_1_90 + 0x0004) + 2)
-05EA E597      1702            mov     a,((_main_voltages_1_90 + 0x0004) + 3)
-05EC 120100    1703            lcall   ___fsdiv
-05EF AA82      1704            mov     r2,dpl
-05F1 AB83      1705            mov     r3,dph
-05F3 AEF0      1706            mov     r6,b
-05F5 FF        1707            mov     r7,a
-05F6 E581      1708            mov     a,sp
-05F8 24FC      1709            add     a,#0xfc
-05FA F581      1710            mov     sp,a
-05FC 749A      1711            mov     a,#0x9A
-05FE C0E0      1712            push    acc
-0600 7499      1713            mov     a,#0x99
-0602 C0E0      1714            push    acc
-0604 C0E0      1715            push    acc
-0606 743E      1716            mov     a,#0x3E
-0608 C0E0      1717            push    acc
-060A 8A82      1718            mov     dpl,r2
-060C 8B83      1719            mov     dph,r3
-060E 8EF0      1720            mov     b,r6
-0610 EF        1721            mov     a,r7
-0611 120100    1722            lcall   ___fssub
-0614 AA82      1723            mov     r2,dpl
-0616 AB83      1724            mov     r3,dph
-0618 AEF0      1725            mov     r6,b
-061A FF        1726            mov     r7,a
-061B E581      1727            mov     a,sp
-061D 24FC      1728            add     a,#0xfc
-061F F581      1729            mov     sp,a
-0621 8A44      1730            mov     (_main_vReadings_1_90 + 0x0004),r2
-0623 8B45      1731            mov     ((_main_vReadings_1_90 + 0x0004) + 1),r3
-0625 8E46      1732            mov     ((_main_vReadings_1_90 + 0x0004) + 2),r6
-0627 8F47      1733            mov     ((_main_vReadings_1_90 + 0x0004) + 3),r7
-0629           1734   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:555: printf("V(P1.3)=%3.2fV, V(P0.2)=%3.2fV Wind = %.2f degrees\r", vReadings[0], vReadings[1], windAngle);
-0629 C018      1735            push    _windAngle
-062B C019      1736            push    (_windAngle + 1)
-062D C01A      1737            push    (_windAngle + 2)
-062F C01B      1738            push    (_windAngle + 3)
-0631 C002      1739            push    ar2
-0633 C003      1740            push    ar3
-0635 C006      1741            push    ar6
-0637 C007      1742            push    ar7
-0639 C020      1743            push    _main_sloc0_1_0
-063B C021      1744            push    (_main_sloc0_1_0 + 1)
-063D C022      1745            push    (_main_sloc0_1_0 + 2)
-063F C023      1746            push    (_main_sloc0_1_0 + 3)
-0641 7468      1747            mov     a,#__str_1
-0643 C0E0      1748            push    acc
-0645 74CB      1749            mov     a,#(__str_1 >> 8)
-0647 C0E0      1750            push    acc
-0649 7480      1751            mov     a,#0x80
-064B C0E0      1752            push    acc
-064D 120100    1753            lcall   _printf
-0650 E581      1754            mov     a,sp
-0652 24F1      1755            add     a,#0xf1
-0654 F581      1756            mov     sp,a
-0656           1757   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:558: measureCount = 0;
-0656           1758   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:559: voltages[0] = 0;
-0656 E4        1759            clr a
-0657 F5E0      1760            mov _main_measureCount_1_90,a
-0659 F5E1      1761            mov (_main_measureCount_1_90 + 1),a
-065B F590      1762            mov _main_voltages_1_90,a
-065D F591      1763            mov (_main_voltages_1_90 + 1),a
-065F F592      1764            mov (_main_voltages_1_90 + 2),a
-0661 F593      1765            mov (_main_voltages_1_90 + 3),a
-0663           1766   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:560: voltages[1] = 0;
-0663 759400    1767            mov     (_main_voltages_1_90 + 0x0004),#0x00
-0666 759500    1768            mov     ((_main_voltages_1_90 + 0x0004) + 1),#0x00
-0669 759600    1769            mov     ((_main_voltages_1_90 + 0x0004) + 2),#0x00
-066C 759700    1770            mov     ((_main_voltages_1_90 + 0x0004) + 3),#0x00
-066F           1771   L014003?:
-066F           1772   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:564: readingADCCounter = 0;
-066F 7C00      1773            mov     r4,#0x00
-0671 7D00      1774            mov     r5,#0x00
-0673           1775   L014008?:
-0673           1776   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:568: wsReadByte();
-0673 C004      1777            push    ar4
-0675 C005      1778            push    ar5
-0677 120100    1779            lcall   _wsReadByte
-067A           1780   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:571: calculateSteps();
-067A 120100    1781            lcall   _calculateSteps
-067D D005      1782            pop     ar5
-067F D004      1783            pop     ar4
-0681 020100    1784            ljmp    L014010?
-0684           1785            rseg R_CSEG
-0684           1786   
-0000           1787            rseg R_XINIT
-0000           1788   
-0000           1789            rseg R_CONST
-0000           1790   __str_0:
-0000 1B        1791            db 0x1B
-0001 5B324A    1792            db '[2J'
-0004 00        1793            db 0x00
-0005           1794   __str_1:
-0005 56285031  1795            db 'V(P1.3)=%3.2fV, V(P0.2)=%3.2fV Wind = %.2f degrees'
+03E6           1409   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:486: stepsCW = windAngle/stepAngle;
+03E6 E4        1410            clr     a
+03E7 C0E0      1411            push    acc
+03E9 C0E0      1412            push    acc
+03EB 7434      1413            mov     a,#0x34
+03ED C0E0      1414            push    acc
+03EF 7441      1415            mov     a,#0x41
+03F1 C0E0      1416            push    acc
+03F3 851882    1417            mov     dpl,_windAngle
+03F6 851983    1418            mov     dph,(_windAngle + 1)
+03F9 851AF0    1419            mov     b,(_windAngle + 2)
+03FC E51B      1420            mov     a,(_windAngle + 3)
+03FE 120100    1421            lcall   ___fsdiv
+0401 AA82      1422            mov     r2,dpl
+0403 AB83      1423            mov     r3,dph
+0405 ACF0      1424            mov     r4,b
+0407 FD        1425            mov     r5,a
+0408 E581      1426            mov     a,sp
+040A 24FC      1427            add     a,#0xfc
+040C F581      1428            mov     sp,a
+040E 8A82      1429            mov     dpl,r2
+0410 8B83      1430            mov     dph,r3
+0412 8CF0      1431            mov     b,r4
+0414 ED        1432            mov     a,r5
+0415 120100    1433            lcall   ___fs2uchar
+0418 858260    1434            mov     _stepsCW,dpl
+041B 22        1435            ret
+041C           1436   L013002?:
+041C           1437   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:490: direction = 0;
+041C           1438   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:491: stepsCCW = (windAngle - 180.0)/stepAngle;
+041C E4        1439            clr     a
+041D F5F0      1440            mov     _direction,a
+041F C0E0      1441            push    acc
+0421 C0E0      1442            push    acc
+0423 7434      1443            mov     a,#0x34
+0425 C0E0      1444            push    acc
+0427 7443      1445            mov     a,#0x43
+0429 C0E0      1446            push    acc
+042B 851882    1447            mov     dpl,_windAngle
+042E 851983    1448            mov     dph,(_windAngle + 1)
+0431 851AF0    1449            mov     b,(_windAngle + 2)
+0434 E51B      1450            mov     a,(_windAngle + 3)
+0436 120100    1451            lcall   ___fssub
+0439 AA82      1452            mov     r2,dpl
+043B AB83      1453            mov     r3,dph
+043D ACF0      1454            mov     r4,b
+043F FD        1455            mov     r5,a
+0440 E581      1456            mov     a,sp
+0442 24FC      1457            add     a,#0xfc
+0444 F581      1458            mov     sp,a
+0446 E4        1459            clr     a
+0447 C0E0      1460            push    acc
+0449 C0E0      1461            push    acc
+044B 7434      1462            mov     a,#0x34
+044D C0E0      1463            push    acc
+044F 7441      1464            mov     a,#0x41
+0451 C0E0      1465            push    acc
+0453 8A82      1466            mov     dpl,r2
+0455 8B83      1467            mov     dph,r3
+0457 8CF0      1468            mov     b,r4
+0459 ED        1469            mov     a,r5
+045A 120100    1470            lcall   ___fsdiv
+045D AA82      1471            mov     r2,dpl
+045F AB83      1472            mov     r3,dph
+0461 ACF0      1473            mov     r4,b
+0463 FD        1474            mov     r5,a
+0464 E581      1475            mov     a,sp
+0466 24FC      1476            add     a,#0xfc
+0468 F581      1477            mov     sp,a
+046A 8A82      1478            mov     dpl,r2
+046C 8B83      1479            mov     dph,r3
+046E 8CF0      1480            mov     b,r4
+0470 ED        1481            mov     a,r5
+0471 120100    1482            lcall   ___fs2uchar
+0474 858220    1483            mov     _stepsCCW,dpl
+0477 22        1484            ret
+0478           1485   L013005?:
+0478           1486   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:496: moveStepperFlag = 0;
+0478 75B000    1487            mov     _moveStepperFlag,#0x00
+047B           1488   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:497: stepsCCW = 0;
+047B 752000    1489            mov     _stepsCCW,#0x00
+047E           1490   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:498: stepsCW = 0;
+047E 756000    1491            mov     _stepsCW,#0x00
+0481 22        1492            ret
+0482           1493   ;------------------------------------------------------------
+0482           1494   ;Allocation info for local variables in function 'main'
+0482           1495   ;------------------------------------------------------------
+0482           1496   ;vReadings                 Allocated with name '_main_vReadings_1_90'
+0482           1497   ;voltages                  Allocated with name '_main_voltages_1_90'
+0482           1498   ;measureCount              Allocated with name '_main_measureCount_1_90'
+0482           1499   ;totalMeasurements         Allocated to registers 
+0482           1500   ;errorConstant             Allocated to registers 
+0482           1501   ;readingADCCounter         Allocated to registers r4 r5 
+0482           1502   ;readingADCTotalInterrupts Allocated to registers 
+0482           1503   ;sloc0                     Allocated with name '_main_sloc0_1_0'
+0482           1504   ;------------------------------------------------------------
+0482           1505   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:503: void main (void) 
+0482           1506   ;        -----------------------------------------
+0482           1507   ;         function main
+0482           1508   ;        -----------------------------------------
+0482           1509   _main:
+0482           1510   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:511: int measureCount = 0;
+0482           1511   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:516: int readingADCCounter = 0;
+0482 E4        1512            clr     a
+0483 F5E0      1513            mov     _main_measureCount_1_90,a
+0485 F5E1      1514            mov     (_main_measureCount_1_90 + 1),a
+0487 FC        1515            mov     r4,a
+0488 FD        1516            mov     r5,a
+0489           1517   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:519: printf("\x1b[2J"); // Clear screen using ANSI escape sequence.
+0489 C004      1518            push    ar4
+048B C005      1519            push    ar5
+048D 7428      1520            mov     a,#__str_0
+048F C0E0      1521            push    acc
+0491 74C8      1522            mov     a,#(__str_0 >> 8)
+0493 C0E0      1523            push    acc
+0495 7480      1524            mov     a,#0x80
+0497 C0E0      1525            push    acc
+0499 120100    1526            lcall   _printf
+049C 1581      1527            dec     sp
+049E 1581      1528            dec     sp
+04A0 1581      1529            dec     sp
+04A2           1530   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:521: ConfigurePins();
+04A2 120100    1531            lcall   _ConfigurePins
+04A5           1532   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:522: ConfigPCA0();
+04A5 120100    1533            lcall   _ConfigPCA0
+04A8           1534   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:523: InitADC();
+04A8 120100    1535            lcall   _InitADC
+04AB D005      1536            pop     ar5
+04AD D004      1537            pop     ar4
+04AF           1538   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:525: while(1) //Main loop of the program begins here
+04AF           1539   L014010?:
+04AF           1540   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:529: if(adcFlag == 1)
+04AF 7401      1541            mov     a,#0x01
+04B1 B530E8    1542            cjne    a,_adcFlag,L014018?
+04B4 8001      1543            sjmp    L014019?
+04B6           1544   L014018?:
+04B6 020100    1545            ljmp    L014008?
+04B9           1546   L014019?:
+04B9           1547   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:532: adcFlag = 0;
+04B9 753000    1548            mov     _adcFlag,#0x00
+04BC           1549   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:535: if(readingADCCounter < readingADCTotalInterrupts)
+04BC C3        1550            clr     c
+04BD EC        1551            mov     a,r4
+04BE 9414      1552            subb    a,#0x14
+04C0 ED        1553            mov     a,r5
+04C1 6480      1554            xrl     a,#0x80
+04C3 9480      1555            subb    a,#0x80
+04C5 5001      1556            jnc     L014005?
+04C7           1557   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:536: readingADCCounter++;
+04C7 0C        1558            inc     r4
+04C8 BC00E8    1559            cjne    r4,#0x00,L014021?
+04CB 0D        1560            inc     r5
+04CC           1561   L014021?:
+04CC 020100    1562            ljmp    L014008?
+04CF           1563   L014005?:
+04CF           1564   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:540: if(measureCount < totalMeasurements)
+04CF C3        1565            clr     c
+04D0 E5E0      1566            mov     a,_main_measureCount_1_90
+04D2 9414      1567            subb    a,#0x14
+04D4 E5E1      1568            mov     a,(_main_measureCount_1_90 + 1)
+04D6 6480      1569            xrl     a,#0x80
+04D8 9480      1570            subb    a,#0x80
+04DA 4001      1571            jc      L014022?
+04DC 020100    1572            ljmp    L014002?
+04DF           1573   L014022?:
+04DF           1574   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:543: voltages[0] += Volts_at_Pin(QFP32_MUX_P1_3);
+04DF 859020    1575            mov     _main_sloc0_1_0,_main_voltages_1_90
+04E2 859121    1576            mov     (_main_sloc0_1_0 + 1),(_main_voltages_1_90 + 1)
+04E5 859222    1577            mov     (_main_sloc0_1_0 + 2),(_main_voltages_1_90 + 2)
+04E8 859323    1578            mov     (_main_sloc0_1_0 + 3),(_main_voltages_1_90 + 3)
+04EB 758209    1579            mov     dpl,#0x09
+04EE 120100    1580            lcall   _Volts_at_Pin
+04F1 AA82      1581            mov     r2,dpl
+04F3 AB83      1582            mov     r3,dph
+04F5 AEF0      1583            mov     r6,b
+04F7 FF        1584            mov     r7,a
+04F8 C002      1585            push    ar2
+04FA C003      1586            push    ar3
+04FC C006      1587            push    ar6
+04FE C007      1588            push    ar7
+0500 852082    1589            mov     dpl,_main_sloc0_1_0
+0503 852183    1590            mov     dph,(_main_sloc0_1_0 + 1)
+0506 8522F0    1591            mov     b,(_main_sloc0_1_0 + 2)
+0509 E523      1592            mov     a,(_main_sloc0_1_0 + 3)
+050B 120100    1593            lcall   ___fsadd
+050E AA82      1594            mov     r2,dpl
+0510 AB83      1595            mov     r3,dph
+0512 AEF0      1596            mov     r6,b
+0514 FF        1597            mov     r7,a
+0515 E581      1598            mov     a,sp
+0517 24FC      1599            add     a,#0xfc
+0519 F581      1600            mov     sp,a
+051B 8A90      1601            mov     _main_voltages_1_90,r2
+051D 8B91      1602            mov     (_main_voltages_1_90 + 1),r3
+051F 8E92      1603            mov     (_main_voltages_1_90 + 2),r6
+0521 8F93      1604            mov     (_main_voltages_1_90 + 3),r7
+0523           1605   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:544: voltages[1] += Volts_at_Pin(QFP32_MUX_P0_2);
+0523 859420    1606            mov     _main_sloc0_1_0,(_main_voltages_1_90 + 0x0004)
+0526 859521    1607            mov     (_main_sloc0_1_0 + 1),((_main_voltages_1_90 + 0x0004) + 1)
+0529 859622    1608            mov     (_main_sloc0_1_0 + 2),((_main_voltages_1_90 + 0x0004) + 2)
+052C 859723    1609            mov     (_main_sloc0_1_0 + 3),((_main_voltages_1_90 + 0x0004) + 3)
+052F 758201    1610            mov     dpl,#0x01
+0532 120100    1611            lcall   _Volts_at_Pin
+0535 AA82      1612            mov     r2,dpl
+0537 AB83      1613            mov     r3,dph
+0539 AEF0      1614            mov     r6,b
+053B FF        1615            mov     r7,a
+053C C002      1616            push    ar2
+053E C003      1617            push    ar3
+0540 C006      1618            push    ar6
+0542 C007      1619            push    ar7
+0544 852082    1620            mov     dpl,_main_sloc0_1_0
+0547 852183    1621            mov     dph,(_main_sloc0_1_0 + 1)
+054A 8522F0    1622            mov     b,(_main_sloc0_1_0 + 2)
+054D E523      1623            mov     a,(_main_sloc0_1_0 + 3)
+054F 120100    1624            lcall   ___fsadd
+0552 AA82      1625            mov     r2,dpl
+0554 AB83      1626            mov     r3,dph
+0556 AEF0      1627            mov     r6,b
+0558 FF        1628            mov     r7,a
+0559 E581      1629            mov     a,sp
+055B 24FC      1630            add     a,#0xfc
+055D F581      1631            mov     sp,a
+055F 8A94      1632            mov     (_main_voltages_1_90 + 0x0004),r2
+0561 8B95      1633            mov     ((_main_voltages_1_90 + 0x0004) + 1),r3
+0563 8E96      1634            mov     ((_main_voltages_1_90 + 0x0004) + 2),r6
+0565 8F97      1635            mov     ((_main_voltages_1_90 + 0x0004) + 3),r7
+0567           1636   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:547: measureCount++;
+0567 05E0      1637            inc     _main_measureCount_1_90
+0569 E4        1638            clr     a
+056A B5E0E8    1639            cjne    a,_main_measureCount_1_90,L014023?
+056D 05E1      1640            inc     (_main_measureCount_1_90 + 1)
+056F           1641   L014023?:
+056F 020100    1642            ljmp    L014003?
+0572           1643   L014002?:
+0572           1644   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:552: vReadings[0] = (voltages[0]/totalMeasurements) - errorConstant;
+0572 E4        1645            clr     a
+0573 C0E0      1646            push    acc
+0575 C0E0      1647            push    acc
+0577 74A0      1648            mov     a,#0xA0
+0579 C0E0      1649            push    acc
+057B 7441      1650            mov     a,#0x41
+057D C0E0      1651            push    acc
+057F 859082    1652            mov     dpl,_main_voltages_1_90
+0582 859183    1653            mov     dph,(_main_voltages_1_90 + 1)
+0585 8592F0    1654            mov     b,(_main_voltages_1_90 + 2)
+0588 E593      1655            mov     a,(_main_voltages_1_90 + 3)
+058A 120100    1656            lcall   ___fsdiv
+058D AA82      1657            mov     r2,dpl
+058F AB83      1658            mov     r3,dph
+0591 AEF0      1659            mov     r6,b
+0593 FF        1660            mov     r7,a
+0594 E581      1661            mov     a,sp
+0596 24FC      1662            add     a,#0xfc
+0598 F581      1663            mov     sp,a
+059A 749A      1664            mov     a,#0x9A
+059C C0E0      1665            push    acc
+059E 7499      1666            mov     a,#0x99
+05A0 C0E0      1667            push    acc
+05A2 C0E0      1668            push    acc
+05A4 743E      1669            mov     a,#0x3E
+05A6 C0E0      1670            push    acc
+05A8 8A82      1671            mov     dpl,r2
+05AA 8B83      1672            mov     dph,r3
+05AC 8EF0      1673            mov     b,r6
+05AE EF        1674            mov     a,r7
+05AF 120100    1675            lcall   ___fssub
+05B2 858220    1676            mov     _main_sloc0_1_0,dpl
+05B5 858321    1677            mov     (_main_sloc0_1_0 + 1),dph
+05B8 85F022    1678            mov     (_main_sloc0_1_0 + 2),b
+05BB F523      1679            mov     (_main_sloc0_1_0 + 3),a
+05BD E581      1680            mov     a,sp
+05BF 24FC      1681            add     a,#0xfc
+05C1 F581      1682            mov     sp,a
+05C3 852040    1683            mov     _main_vReadings_1_90,_main_sloc0_1_0
+05C6 852141    1684            mov     (_main_vReadings_1_90 + 1),(_main_sloc0_1_0 + 1)
+05C9 852242    1685            mov     (_main_vReadings_1_90 + 2),(_main_sloc0_1_0 + 2)
+05CC 852343    1686            mov     (_main_vReadings_1_90 + 3),(_main_sloc0_1_0 + 3)
+05CF           1687   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:553: vReadings[1] = (voltages[1]/totalMeasurements) - errorConstant;
+05CF E4        1688            clr     a
+05D0 C0E0      1689            push    acc
+05D2 C0E0      1690            push    acc
+05D4 74A0      1691            mov     a,#0xA0
+05D6 C0E0      1692            push    acc
+05D8 7441      1693            mov     a,#0x41
+05DA C0E0      1694            push    acc
+05DC 859482    1695            mov     dpl,(_main_voltages_1_90 + 0x0004)
+05DF 859583    1696            mov     dph,((_main_voltages_1_90 + 0x0004) + 1)
+05E2 8596F0    1697            mov     b,((_main_voltages_1_90 + 0x0004) + 2)
+05E5 E597      1698            mov     a,((_main_voltages_1_90 + 0x0004) + 3)
+05E7 120100    1699            lcall   ___fsdiv
+05EA AA82      1700            mov     r2,dpl
+05EC AB83      1701            mov     r3,dph
+05EE AEF0      1702            mov     r6,b
+05F0 FF        1703            mov     r7,a
+05F1 E581      1704            mov     a,sp
+05F3 24FC      1705            add     a,#0xfc
+05F5 F581      1706            mov     sp,a
+05F7 749A      1707            mov     a,#0x9A
+05F9 C0E0      1708            push    acc
+05FB 7499      1709            mov     a,#0x99
+05FD C0E0      1710            push    acc
+05FF C0E0      1711            push    acc
+0601 743E      1712            mov     a,#0x3E
+0603 C0E0      1713            push    acc
+0605 8A82      1714            mov     dpl,r2
+0607 8B83      1715            mov     dph,r3
+0609 8EF0      1716            mov     b,r6
+060B EF        1717            mov     a,r7
+060C 120100    1718            lcall   ___fssub
+060F AA82      1719            mov     r2,dpl
+0611 AB83      1720            mov     r3,dph
+0613 AEF0      1721            mov     r6,b
+0615 FF        1722            mov     r7,a
+0616 E581      1723            mov     a,sp
+0618 24FC      1724            add     a,#0xfc
+061A F581      1725            mov     sp,a
+061C 8A44      1726            mov     (_main_vReadings_1_90 + 0x0004),r2
+061E 8B45      1727            mov     ((_main_vReadings_1_90 + 0x0004) + 1),r3
+0620 8E46      1728            mov     ((_main_vReadings_1_90 + 0x0004) + 2),r6
+0622 8F47      1729            mov     ((_main_vReadings_1_90 + 0x0004) + 3),r7
+0624           1730   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:556: printf("V(P1.3)=%3.2fV, V(P0.2)=%3.2fV Wind = %.2f degrees\r", vReadings[0], vReadings[1], windAngle);
+0624 C018      1731            push    _windAngle
+0626 C019      1732            push    (_windAngle + 1)
+0628 C01A      1733            push    (_windAngle + 2)
+062A C01B      1734            push    (_windAngle + 3)
+062C C002      1735            push    ar2
+062E C003      1736            push    ar3
+0630 C006      1737            push    ar6
+0632 C007      1738            push    ar7
+0634 C020      1739            push    _main_sloc0_1_0
+0636 C021      1740            push    (_main_sloc0_1_0 + 1)
+0638 C022      1741            push    (_main_sloc0_1_0 + 2)
+063A C023      1742            push    (_main_sloc0_1_0 + 3)
+063C 7468      1743            mov     a,#__str_1
+063E C0E0      1744            push    acc
+0640 74CB      1745            mov     a,#(__str_1 >> 8)
+0642 C0E0      1746            push    acc
+0644 7480      1747            mov     a,#0x80
+0646 C0E0      1748            push    acc
+0648 120100    1749            lcall   _printf
+064B E581      1750            mov     a,sp
+064D 24F1      1751            add     a,#0xf1
+064F F581      1752            mov     sp,a
+0651           1753   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:559: measureCount = 0;
+0651           1754   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:560: voltages[0] = 0;
+0651 E4        1755            clr a
+0652 F5E0      1756            mov _main_measureCount_1_90,a
+0654 F5E1      1757            mov (_main_measureCount_1_90 + 1),a
+0656 F590      1758            mov _main_voltages_1_90,a
+0658 F591      1759            mov (_main_voltages_1_90 + 1),a
+065A F592      1760            mov (_main_voltages_1_90 + 2),a
+065C F593      1761            mov (_main_voltages_1_90 + 3),a
+065E           1762   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:561: voltages[1] = 0;
+065E 759400    1763            mov     (_main_voltages_1_90 + 0x0004),#0x00
+0661 759500    1764            mov     ((_main_voltages_1_90 + 0x0004) + 1),#0x00
+0664 759600    1765            mov     ((_main_voltages_1_90 + 0x0004) + 2),#0x00
+0667 759700    1766            mov     ((_main_voltages_1_90 + 0x0004) + 3),#0x00
+066A           1767   L014003?:
+066A           1768   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:565: readingADCCounter = 0;
+066A 7C00      1769            mov     r4,#0x00
+066C 7D00      1770            mov     r5,#0x00
+066E           1771   L014008?:
+066E           1772   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:569: wsReadByte();
+066E C004      1773            push    ar4
+0670 C005      1774            push    ar5
+0672 120100    1775            lcall   _wsReadByte
+0675           1776   ;        C:\Users\Fabian Lozano\Desktop\UBC\UBC3rdYear\Term 2\ELEC 391\Controller\Code\PCA.c:572: calculateSteps();
+0675 120100    1777            lcall   _calculateSteps
+0678 D005      1778            pop     ar5
+067A D004      1779            pop     ar4
+067C 020100    1780            ljmp    L014010?
+067F           1781            rseg R_CSEG
+067F           1782   
+0000           1783            rseg R_XINIT
+0000           1784   
+0000           1785            rseg R_CONST
+0000           1786   __str_0:
+0000 1B        1787            db 0x1B
+0001 5B324A    1788            db '[2J'
+0004 00        1789            db 0x00
+0005           1790   __str_1:
+0005 56285031  1791            db 'V(P1.3)=%3.2fV, V(P0.2)=%3.2fV Wind = %.2f degrees'
      2E33293D
      25332E32
      66562C20
@@ -1805,9 +1801,9 @@
      32662064
      65677265
      6573
-0037 0D        1796            db 0x0D
-0038 00        1797            db 0x00
-0039           1798   
-0076           1799            CSEG
-0076           1800   
-0076           1801   end
+0037 0D        1792            db 0x0D
+0038 00        1793            db 0x00
+0039           1794   
+0076           1795            CSEG
+0076           1796   
+0076           1797   end

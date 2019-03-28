@@ -188,14 +188,14 @@ void Timer2_ISR (void) interrupt INTERRUPT_TIMER2
 	//--------------------------------
 	//Motor control
 	//--------------------------------
-	if(moveStepperFlag == 1)
+	if(moveStepperFlag == 1) //If rotation is enabled
 	{ 
-		if(interruptCount == 4)
+		if(interruptCount == 4) //Check if timing constraint for the stepper motor coils is met
 		{
-			interruptCount = 0;
-			if(direction == 1)
+			interruptCount = 0; //Reset the interrupt counter
+			if(direction == 1) //Check for clockwise movement direction
 			{
-				if(stepsCW != 0)
+				if(stepsCW != 0) 
 				{
 					if(stepNumber == 0)
 					{
@@ -227,7 +227,7 @@ void Timer2_ISR (void) interrupt INTERRUPT_TIMER2
 					}
 				}
 			}
-			else
+			else //If not CW, CCW movement direction is selected
 			{
 				if(stepsCCW != 0)
 				{
@@ -361,7 +361,7 @@ void ConfigPCA0()
 	
 	//CHANNEL 0 CONFIGURATION
 	PCA0CPM0 = 0b_0100_0010;//Configure Channel 0 to function in 8-bit PWM mode
-	PCA0CPH0 = 128; //Load the PCA0CP0 high byte 
+	PCA0CPH0 = 77; //Load the PCA0CP0 high byte 
 	
 }
 
@@ -428,7 +428,7 @@ void wsReadByte()
 		
 		else //Second start byte
 		{
-			 SPIWrite(0xFF); //Write the start byte to the sensor and store the incoming byte 
+			SPIWrite(0xFF); //Write the start byte to the sensor and store the incoming byte 
 			spiBytes[spiByteNum] = SPI0DAT;
 			spiByteNum++;
 			
@@ -473,24 +473,25 @@ void calculateSteps()
 {
 	float stepAngle = 11.25;
 
+	//Check if the angle read is greater than or equal to the step angle in both directions of rotation
 	if((windAngle >= stepAngle) & (windAngle <= (360.0 - stepAngle))) 
 	{
+		//Enable the movement of the stepper motor
 		moveStepperFlag = 1;
 		
-		if(windAngle <= 180.0)
+		//Check if the angle is more inclined towards the clockwise direction
+		if(windAngle <= 180.0) 
 		{
 			direction = 1;
-			stepsCCW = 0;
 			stepsCW = windAngle/stepAngle;
 		}
-		else
+		else //If not, angle is more inclined towards anticlockwise direction
 		{
 			direction = 0;
-			stepsCW = 0;
 			stepsCCW = (windAngle - 180.0)/stepAngle;
 		}
 	}
-	else 
+	else //When the angle is smaller than the step angle, disable rotation
 	{
 		moveStepperFlag = 0;
 		stepsCCW = 0;
